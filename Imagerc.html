@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Compress & Resize Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        .navbar {
+            width: 100%;
+            background-color: #007bff;
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            color: white;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            margin: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 80%;
+        }
+        .preview {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:active {
+            transform: translateY(2px);
+        }
+        .loading-bar {
+            width: 100%;
+            height: 5px;
+            background: #007bff;
+            animation: loading 2s infinite;
+        }
+        @keyframes loading {
+            0% { width: 0%; }
+            50% { width: 100%; }
+            100% { width: 0%; }
+        }
+        #developer, #about {
+            display: none;
+        }
+        .file-size {
+            margin-bottom: 15px;
+        }
+        .social-links a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="#home" onclick="showSection('home')">Home</a>
+        <a href="#developer" onclick="showSection('developer')">Developer</a>
+        <a href="#about" onclick="showSection('about')">About</a>
+    </div>
+
+    <div id="home" class="container">
+        <div class="preview">
+            <img id="previewImage" src="https://via.placeholder.com/300" alt="Image Preview">
+        </div>
+        <div class="input-group">
+            <label for="uploadImage">Choose Photo</label>
+            <input type="file" id="uploadImage" accept="image/*">
+        </div>
+        <div class="input-group">
+            <label for="width">Width (px)</label>
+            <input type="number" id="width" placeholder="Enter width">
+        </div>
+        <div class="input-group">
+            <label for="height">Height (px)</label>
+            <input type="number" id="height" placeholder="Enter height">
+        </div>
+        <div class="input-group">
+            <label for="quality">Quality</label>
+            <input type="range" id="quality" min="0" max="100" value="100" oninput="updateImage()">
+        </div>
+        <div class="file-size" id="fileSizeDisplay">
+            File Size: 0 KB
+        </div>
+        <div class="input-group">
+            <label for="fileSize">Compress to file size below</label>
+            <select id="fileSize">
+                <option value="10">10 MB</option>
+                <option value="5">5 MB</option>
+                <option value="2">2 MB</option>
+                <option value="1">1 MB</option>
+                <option value="0.5">0.5 MB</option>
+            </select>
+        </div>
+        <button class="btn" onclick="compressImage()">Compress</button>
+        <button class="btn" onclick="downloadImage()">Download</button>
+        <div id="loadingBar" class="loading-bar" style="display: none;"></div>
+    </div>
+
+   <div id="developer" class="container">
+    <h2>Developer</h2>
+    <p>Hi, I'm SUSHIL CHOUDHARY, the developer behind this Image Compress & Resize Tool.</p>
+    
+    <h3>Background</h3>
+    <p>With a background in [Your Field/Experience], I have been passionate about creating useful web tools and applications that solve everyday problems. This tool is a product of that passion, aimed at helping users manage and optimize their images effortlessly.</p>
+    
+    <h3>Development Purpose</h3>
+    <p>This tool was developed to provide an easy and efficient way for users to compress and resize images. Whether for personal use or professional needs, this tool simplifies the process and ensures high-quality results.</p>
+    
+    <h3>Technologies Used</h3>
+    <ul>
+        <li>HTML5 and CSS3 for the structure and styling of the tool.</li>
+        <li>JavaScript for interactivity and functionality.</li>
+        <li>Canvas API for image manipulation.</li>
+    </ul>
+    
+    <h3>Future Plans</h3>
+    <p>We are constantly looking to improve and expand the tool's capabilities. Future updates may include additional image formats, more compression options, and enhanced user experience features. Stay tuned for updates!</p>
+    
+    <h3>Contact</h3>
+    <p>If you have any questions, feedback, or suggestions, feel free to reach out to me at:</p>
+    <p>Email: [Your Email]</p>
+    
+    <h3>Social Media</h3>
+    <div class="social-links">
+        <a href="https://t.me/jathacking01" target="_blank">Teligram</a>
+        <a href="https://www.instagram.com/sushiljat01?igsh=MXBxZGM3and0NjNxNQ==" target="_blank">Instagram</a>
+    </div>
+</div>
+
+    <div id="about" class="container">
+    <h2>About</h2>
+    <p>Welcome to our Image Compress & Resize Tool!</p>
+    <p>This tool is designed to help you easily compress and resize your images. Whether you're looking to save storage space, optimize images for your website, or share images on social media, our tool provides a simple and effective solution.</p>
+    
+    <h3>Key Features</h3>
+    <ul>
+        <li>Adjust image dimensions (width and height).</li>
+        <li>Compress images to a specific file size while maintaining quality.</li>
+        <li>Preview changes in real-time before downloading.</li>
+        <li>User-friendly interface with a smooth experience.</li>
+    </ul>
+    
+    <h3>How to Use</h3>
+    <ol>
+        <li>Upload your image by clicking on "Choose Photo".</li>
+        <li>Adjust the width and height if needed.</li>
+        <li>Set the desired quality and file size.</li>
+        <li>Click "Compress" to apply the changes.</li>
+        <li>Preview the image and download it if satisfied.</li>
+    </ol>
+    
+    <h3>Benefits</h3>
+    <p>Using this tool, you can ensure faster load times for your websites, reduce data usage when sharing images, and better manage your device storage. It's a handy tool for anyone dealing with images regularly.</p>
+    
+    <h3>Developer</h3>
+    <p>Developed by SUSHIL CHOUDHARY. Feel free to reach out with any questions or feedback.</p>
+    <p>Contact: SUSHIL6311JAT@GMAIL.COM</p>
+</div>
+
+    <script>
+        const uploadImage = document.getElementById('uploadImage');
+        const previewImage = document.getElementById('previewImage');
+        const widthInput = document.getElementById('width');
+        const heightInput = document.getElementById('height');
+        const qualityInput = document.getElementById('quality');
+        const fileSizeInput = document.getElementById('fileSize');
+        const fileSizeDisplay = document.getElementById('fileSizeDisplay');
+        const loadingBar = document.getElementById('loadingBar');
+
+        let originalImage = null;
+
+        uploadImage.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                originalImage = new Image();
+                originalImage.src = event.target.result;
+                originalImage.onload = function () {
+                    updateImage();
+                };
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function showSection(section) {
+            document.getElementById('home').style.display = 'none';
+            document.getElementById('developer').style.display = 'none';
+            document.getElementById('about').style.display = 'none';
+            document.getElementById(section).style.display = 'block';
+        }
+
+        function updateImage() {
+            if (!originalImage) return;
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const width = widthInput.value || originalImage.width;
+            const height = heightInput.value || originalImage.height;
+            const quality = qualityInput.value / 100;
+
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(originalImage, 0, 0, width, height);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            previewImage.src = dataUrl;
+
+            const base64String = dataUrl.split(',')[1];
+            const byteCharacters = atob(base64String);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'image/jpeg' });
+            const sizeInKB = (blob.size / 1024).toFixed(2);
+            const sizeInMB = (blob.size / 1024 / 1024).toFixed(2);
+
+            fileSizeDisplay.textContent = `File Size: ${sizeInKB > 1024 ? sizeInMB + ' MB' : sizeInKB + ' KB'}`;
+        }
+
+        function compressImage() {
+            loadingBar.style.display = 'block';
+            setTimeout(() => {
+                updateImage();
+                loadingBar.style.display = 'none';
+                alert('Image compressed and resized successfully!');
+            }, 2000);
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.href = previewImage.src;
+            link.download = 'compressed_image.jpg';
+            link.click();
+        }
+    </script>
+</body>
+</html>
