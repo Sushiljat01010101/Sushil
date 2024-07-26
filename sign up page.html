@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: #0e0e0e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            color: #00f3ff;
+        }
+
+        .signup-container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px #00f3ff;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .signup-container h2 {
+            color: #00f3ff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #00ffab, 0 0 20px #00f3ff;
+        }
+
+        .signup-container input {
+            width: calc(100% - 20px);
+            padding: 15px;
+            margin: 15px 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #1c1c1c;
+            color: #00f3ff;
+            box-shadow: 0 0 10px #00f3ff, 0 0 20px #00ffab;
+        }
+
+        .signup-container button {
+            background-color: #00f3ff;
+            border: none;
+            color: #000;
+            padding: 15px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            width: 100%;
+            font-size: 1.2em;
+            text-shadow: 0 0 5px #00ffab, 0 0 10px #00f3ff;
+        }
+
+        .signup-container button:hover {
+            background-color: #00ffab;
+            box-shadow: 0 0 20px #00f3ff, 0 0 30px #00ffab;
+        }
+
+        .background-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .circle, .line, .gear {
+            position: absolute;
+        }
+
+        .circle {
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(0, 243, 255, 0.1), rgba(0, 243, 255, 0.3));
+            animation: animateCircle 20s linear infinite;
+        }
+
+        @keyframes animateCircle {
+            0% {
+                transform: translateY(100vh) scale(0);
+            }
+            50% {
+                transform: translateY(-50vh) scale(1);
+            }
+            100% {
+                transform: translateY(-100vh) scale(0);
+            }
+        }
+
+        .line {
+            width: 2px;
+            height: 100vh;
+            background: linear-gradient(180deg, rgba(0, 243, 255, 0.2), rgba(0, 243, 255, 0.4));
+            animation: animateLine 15s linear infinite;
+        }
+
+        @keyframes animateLine {
+            0% {
+                transform: translateX(100vw) scale(0);
+            }
+            50% {
+                transform: translateX(-50vw) scale(1);
+            }
+            100% {
+                transform: translateX(-100vw) scale(0);
+            }
+        }
+
+        .gear {
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(0, 243, 255, 0.2), rgba(0, 243, 255, 0.5));
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            animation: rotateGear 30s linear infinite;
+        }
+
+        @keyframes rotateGear {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .circle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 50%;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(0, 243, 255, 0.3), rgba(0, 243, 255, 0.5));
+            animation: animateInnerCircle 10s linear infinite;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        @keyframes animateInnerCircle {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.5);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .profile-photo {
+            width: 100px; /* Adjust the size as needed */
+            height: 100px;
+            border-radius: 50%; /* Makes the image round */
+            object-fit: cover; /* Ensures the image covers the area without distortion */
+            margin-bottom: 20px; /* Space between the image and the form */
+            box-shadow: 0 0 10px #00f3ff; /* Optional: Add a glow effect around the photo */
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation">
+        <div class="circle" style="width: 200px; height: 200px; left: 20%; animation-delay: 0s;"></div>
+        <div class="circle" style="width: 300px; height: 300px; left: 60%; animation-delay: 5s;"></div>
+        <div class="circle" style="width: 250px; height: 250px; left: 40%; animation-delay: 10s;"></div>
+        <div class="circle" style="width: 150px; height: 150px; left: 80%; animation-delay: 15s;"></div>
+        <div class="circle" style="width: 100px; height: 100px; left: 30%; animation-delay: 20s;"></div>
+        <div class="line" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="line" style="left: 30%; animation-delay: 3s;"></div>
+        <div class="line" style="left: 50%; animation-delay: 6s;"></div>
+        <div class="line" style="left: 70%; animation-delay: 9s;"></div>
+        <div class="line" style="left: 90%; animation-delay: 12s;"></div>
+        <div class="gear" style="width: 100px; height: 100px; top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="gear" style="width: 150px; height: 150px; top: 60%; left: 70%; animation-delay: 10s;"></div>
+        <div class="gear" style="width: 120px; height: 120px; top: 80%; left: 40%; animation-delay: 20s;"></div>
+    </div>
+    <div class="signup-container">
+        <img src="https://firebasestorage.googleapis.com/v0/b/sushiljat01-af741.appspot.com/o/IMG_20240712_174716.jpg?alt=media&token=18faad2e-871c-4368-bf55-c077d1b8bf6b" alt="Profile Photo" class="profile-photo">
+        <h2>Sign Up</h2>
+        <form id="signupForm">
+            <input type="text" id="fullname" placeholder="Full Name" required>
+            <input type="text" id="mobile" placeholder="Mobile Number" required>
+            <button type="submit">Sign Up</button>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('signedUp')) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const fullname = document.getElementById('fullname').value;
+            const mobile = document.getElementById('mobile').value;
+
+            if (!/^\d{10}$/.test(mobile)) {
+                alert('Please enter a valid 10-digit mobile number.');
+                return;
+            }
+
+            // Send data to Telegram bot
+            const botToken = '7455670410:AAFyu4dCgrvfZXhrwRf9WAjn7g1mJyKnqdQ';
+            const chatId = '1691680798';
+            const message = `New sign-up:\nFull Name: ${fullname}\nMobile Number: ${mobile}`;
+
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        localStorage.setItem('signedUp', true);
+                        window.location.href = 'index.html';
+                    } else {
+                        alert('Failed to sign up. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    alert('An error occurred. Please try again.');
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+</html>

