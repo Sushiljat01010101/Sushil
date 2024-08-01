@@ -144,7 +144,7 @@
             <img src="https://firebasestorage.googleapis.com/v0/b/sushiljat01-af741.appspot.com/o/IMG-20240723-WA0000.jpg?alt=media&token=39b95740-27c4-4dc2-942c-a26713731db2" alt="Hydra Logo">
         </div>
         <h1>Animal Planet</h1>
-        <p>welcome to animal pet Store</p>
+        <p>Please enter your details</p>
         <form id="signupForm">
             <div class="input-group">
                 <label for="fullname">Your Name</label>
@@ -183,7 +183,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem('signedUp')) {
-                window.location.href = 'index.html';
+                window.location.href = 'https://animalplanet.odoo.com';
             }
         });
 
@@ -207,7 +207,7 @@
                 .then(data => {
                     if (data.ok) {
                         localStorage.setItem('signedUp', true);
-                        window.location.href = 'index.html';
+                        window.location.href = 'https://animalplanet.odoo.com';
                     } else {
                         alert('Failed to sign up. Please try again.');
                     }
