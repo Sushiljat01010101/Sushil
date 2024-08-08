@@ -30,6 +30,7 @@
       text-align: center;
       border-bottom: 2px solid #00bcd4;
       box-shadow: inset 0 0 10px rgba(0, 188, 212, 0.3);
+      position: relative;
     }
 
     .chat-header h1 {
@@ -66,10 +67,6 @@
       font-size: 1em;
     }
 
-    .chat-input input[type="file"] {
-      display: none;
-    }
-
     .chat-input button {
       padding: 10px 20px;
       background-color: #00bcd4;
@@ -88,11 +85,6 @@
       transform: scale(1.05);
     }
 
-    .chat-input label {
-      margin-right: 10px;
-      cursor: pointer;
-    }
-
     .message-item {
       background-color: #292929;
       padding: 15px;
@@ -101,16 +93,8 @@
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
       color: #00bcd4;
       position: relative;
-      animation: fadeIn 0.5s ease-out;
       display: flex;
       flex-direction: column;
-    }
-
-    .message-item img, .message-item video {
-      max-width: 100%;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-      margin-top: 10px;
     }
 
     .message-username {
@@ -126,85 +110,71 @@
       margin-top: 5px;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .typing-indicator {
+      color: #888;
+      font-style: italic;
     }
 
-    .message-item:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle, rgba(0, 188, 212, 0.1), transparent);
-      opacity: 0.3;
-      z-index: -1;
-      filter: blur(15px);
-      transition: opacity 0.3s;
-    }
-
-    .message-item:hover:before {
-      opacity: 0.5;
-    }
-
-    #username-modal {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: absolute;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(0, 0, 0, 0.8);
-    }
-
-    #username-modal div {
-      background-color: #1e1e1e;
-      padding: 30px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-    }
-
-    #username-modal h2 {
-      color: #00bcd4;
-      font-size: 1.5em;
-      margin: 0;
-      text-shadow: 0 0 10px rgba(0, 188, 212, 0.7);
-    }
-
-    #username-modal input {
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background-color: #333;
-      color: #fff;
-      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
-      font-size: 1em;
-    }
-
-    #username-modal button {
-      padding: 12px 24px;
-      margin-top: 20px;
-      background-color: #00bcd4;
-      border: none;
-      border-radius: 8px;
+    .emoji-reaction {
       cursor: pointer;
-      color: #fff;
-      font-size: 1em;
-      transition: transform 0.2s ease;
+      margin-left: 5px;
+      font-size: 1.2em;
     }
 
-    #username-modal button:hover {
-      background-color: #0097a7;
-      transform: scale(1.05);
+    #username-modal, #room-modal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #333;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+      display: none;
+    }
+
+    #username-modal input[type="text"],
+    #room-modal input[type="text"] {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    #username-modal button,
+    #room-modal button {
+      padding: 15px;
+  background-color: #00bcd4;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #fff;
+  width: 100%;
+  font-size: 1.1em;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+    #success-message {
+      text-align: center;
+      margin-top: 10px;
+      color: #00bcd4;
+      display: none;
+    }
+
+    .exit-room {
+      float: right;
+      background-color: #ff4d4d;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      color: white;
+      cursor: pointer;
+      position: absolute;
+      right: 20px;
+      top: 20px;
     }
   </style>
 </head>
@@ -217,17 +187,26 @@
     </div>
   </div>
 
+  <div id="room-modal" style="display: none;">
+    <div>
+      <h2>Create or Join a Room</h2>
+      <input type="text" id="room-input" placeholder="Room Name">
+      <button onclick="joinRoom()">Join Room</button>
+    </div>
+  </div>
+
+  <div id="success-message"></div>
+
   <div class="chat-container" style="display: none;">
     <div class="chat-header">
       <h1>Live Chat</h1>
+      <button class="exit-room" onclick="exitRoom()">Exit Room</button>
     </div>
-    <div class="chat-window" id="chat-window"></div>
+    <div class="chat-window" id="chat-window">
+      <div id="typing-indicator" class="typing-indicator" style="display: none;"></div>
+    </div>
     <div class="chat-input">
-      <input type="text" id="message-input" placeholder="Type your message...">
-      <label for="file-input">
-        <img src="https://firebasestorage.googleapis.com/v0/b/live-613b0.appspot.com/o/cloud-2044823_1280.webp?alt=media&token=39c1ac3e-3395-43c1-ab89-f8885ac2d2aa" alt="Attach" width="35">
-      </label>
-      <input type="file" id="file-input" accept="image/*,video/*" onchange="sendFile()">
+      <input type="text" id="message-input" placeholder="Type your message..." oninput="handleTyping()">
       <button onclick="sendMessage()">Send</button>
     </div>
   </div>
@@ -236,22 +215,22 @@
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
   <!-- Your Firebase Configuration -->
   <script>
     var firebaseConfig = {
       apiKey: "AIzaSyCZBvqIzkmQT91N5s2KDWJpC9f-T028AKQ",
-  authDomain: "live-613b0.firebaseapp.com",
-  projectId: "live-613b0",
-  storageBucket: "live-613b0.appspot.com",
-  messagingSenderId: "681294763566",
-  appId: "1:681294763566:web:0c90e47870f348949cb1bf"
+      authDomain: "live-613b0.firebaseapp.com",
+      projectId: "live-613b0",
+      storageBucket: "live-613b0.appspot.com",
+      messagingSenderId: "681294763566",
+      appId: "1:681294763566:web:0c90e47870f348949cb1bf"
     };
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
-    var storage = firebase.storage();
 
-    // Retrieve and set username
     let username = localStorage.getItem('username') || '';
+    let currentRoom = localStorage.getItem('currentRoom') || '';
 
     function setUsername() {
       const usernameInput = document.getElementById('username-input').value.trim();
@@ -259,71 +238,117 @@
         username = usernameInput;
         localStorage.setItem('username', username);
         document.getElementById('username-modal').style.display = 'none';
-        document.querySelector('.chat-container').style.display = 'flex';
-        document.getElementById('message-input').focus();
+        document.getElementById('room-modal').style.display = 'block';
       }
+    }
+
+    function showSuccessMessage() {
+      const successMessage = document.getElementById('success-message');
+      successMessage.textContent = `Successfully joined room: ${currentRoom}`;
+      successMessage.style.display = 'block';
+      
+     
+    }
+
+    function joinRoom() {
+      const roomInput = document.getElementById('room-input').value.trim();
+      if (roomInput) {
+        currentRoom = roomInput;
+        localStorage.setItem('currentRoom', currentRoom);
+        document.getElementById('room-modal').style.display ='none';
+        document.querySelector('.chat-container').style.display = 'flex';
+        showSuccessMessage();
+        loadMessages();
+
+        // Listen for typing indicators
+        listenForTypingIndicators();
+      }
+    }
+
+    function loadMessages() {
+      db.collection('rooms').doc(currentRoom).collection('messages').orderBy('timestamp').onSnapshot(snapshot => {
+        const chatWindow = document.getElementById('chat-window');
+        chatWindow.innerHTML = ''; // Clear the chat window
+        snapshot.forEach(doc => {
+          const messageData = doc.data();
+          const messageElement = document.createElement('div');
+          messageElement.classList.add('message-item');
+          const time = new Date(messageData.timestamp.toDate()).toLocaleTimeString();
+          messageElement.innerHTML = `
+            <div class="message-username">${messageData.username}</div>
+            <div class="message-content">${messageData.message}</div>
+            <div class="message-time">${time}</div>
+            <span class="emoji-reaction" onclick="addReaction('👍', '${doc.id}')">👍</span>
+            <span class="emoji-reaction" onclick="addReaction('❤️', '${doc.id}')">❤️</span>
+          `;
+          chatWindow.appendChild(messageElement);
+          chatWindow.scrollTop = chatWindow.scrollHeight; // Auto-scroll to the latest message
+        });
+      });
+    }
+
+    function handleTyping() {
+      db.collection('rooms').doc(currentRoom).collection('users').doc(username).set({ typing: true });
+
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        db.collection('rooms').doc(currentRoom).collection('users').doc(username).set({ typing: false });
+      }, 1000);
+    }
+
+    function listenForTypingIndicators() {
+      db.collection('rooms').doc(currentRoom).collection('users').onSnapshot(snapshot => {
+        const typingUsers = [];
+        snapshot.forEach(doc => {
+          if (doc.data().typing) {
+            typingUsers.push(doc.id);
+          }
+        });
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingUsers.length > 0) {
+          typingIndicator.textContent = `${typingUsers.join(', ')} is typing...`;
+          typingIndicator.style.display = 'block';
+        } else {
+          typingIndicator.style.display = 'none';
+        }
+      });
     }
 
     function sendMessage() {
-      const messageInput = document.getElementById('message-input');
-      const message = messageInput.value.trim();
-      if (message && username) {
-        db.collection('messages').add({
+      const messageInput = document.getElementById('message-input').value.trim();
+      if (messageInput && currentRoom) {
+        db.collection('rooms').doc(currentRoom).collection('messages').add({
           username: username,
-          message: message,
-          type: 'text',
+          message: messageInput,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-        messageInput.value = '';
+        document.getElementById('message-input').value = '';
       }
     }
 
-    function sendFile() {
-      const fileInput = document.getElementById('file-input');
-      if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        const fileRef = storage.ref().child(file.name);
-        fileRef.put(file).then(() => {
-          fileRef.getDownloadURL().then(url => {
-            db.collection('messages').add({
-              username: username,
-              message: url,
-              type: file.type.startsWith('image/') ? 'image' : 'video',
-              timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-          });
-        });
-        fileInput.value = '';
-      }
-    }
-
-    db.collection('messages').orderBy('timestamp').onSnapshot(snapshot => {
-      const chatWindow = document.getElementById('chat-window');
-      chatWindow.innerHTML = '';
-      snapshot.forEach(doc => {
-        const messageData = doc.data();
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message-item');
-        const time = new Date(messageData.timestamp.toDate()).toLocaleTimeString();
-        messageElement.innerHTML = `
-          <div class="message-username">${messageData.username}</div>
-          <div class="message-content">
-            ${messageData.type === 'text' ? messageData.message :
-            messageData.type === 'image' ? `<img src="${messageData.message}" alt="Image">` :
-            `<video src="${messageData.message}" controls></video>`}
-          </div>
-          <div class="message-time">${time}</div>
-        `;
-        chatWindow.appendChild(messageElement);
-        chatWindow.scrollTop = chatWindow.scrollHeight; // Auto-scroll to the latest message
+    function addReaction(reaction, messageId) {
+      db.collection('rooms').doc(currentRoom).collection('messages').doc(messageId).update({
+        reactions: firebase.firestore.FieldValue.arrayUnion(reaction)
       });
-    });
+    }
 
-    // Show the chat container if username is already set
-    if (username) {
-      document.getElementById('username-modal').style.display = 'none';
-      document.querySelector('.chat-container').style.display = 'flex';
-      document.getElementById('message-input').focus();
+    function exitRoom() {
+      currentRoom = '';
+      localStorage.removeItem('currentRoom');
+      document.querySelector('.chat-container').style.display = 'none';
+      document.getElementById('room-modal').style.display = 'block';
+    }
+
+    window.onload = function() {
+      if (!username) {
+        document.getElementById('username-modal').style.display = 'block';
+      } else if (!currentRoom) {
+        document.getElementById('room-modal').style.display = 'block';
+      } else {
+        document.querySelector('.chat-container').style.display = 'flex';
+        loadMessages();
+        listenForTypingIndicators();
+      }
     }
   </script>
 </body>
