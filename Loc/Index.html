@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatic Location Capture</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tracking Your Location...</h1>
+        <p id="status">Please wait while we capture your location.</p>
+    </div>
+
+    <script>
+        window.onload = function() {
+            var status = document.getElementById('status');
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", "save_location.php", true);
+                    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState === 4 && xhr.status === 200) {
+                            status.textContent = xhr.responseText;
+                        }
+                    };
+                    xhr.send("latitude=" + latitude + "&longitude=" + longitude);
+                }, function(error) {
+                    status.textContent = 'Unable to retrieve location: ' + error.message;
+                });
+            } else {
+                status.textContent = 'Geolocation is not supported by your browser.';
+            }
+        };
+    </script>
+</body>
+</html>
