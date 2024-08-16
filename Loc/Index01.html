@@ -7,14 +7,24 @@
 </head>
 <body>
     <h1>Location Capture</h1>
+    <p id="status">Requesting location access...</p>
 
     <script>
-        // Function to get the user's location
-        function captureLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(sendLocation);
-            } else {
-                alert("Geolocation is not supported by this browser.");
+        // Function to handle errors
+        function handleError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById("status").textContent = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById("status").textContent = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById("status").textContent = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById("status").textContent = "An unknown error occurred.";
+                    break;
             }
         }
 
@@ -54,9 +64,18 @@
             form.submit();
         }
 
-        // Automatically capture location on page load
+        // Function to get the user's location
+        function captureLocation() {
+            if (navigator.geolocation) {
+                document.getElementById("status").textContent = "Requesting location...";
+                navigator.geolocation.getCurrentPosition(sendLocation, handleError);
+            } else {
+                document.getElementById("status").textContent = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        // Automatically request location on page load
         window.onload = captureLocation;
     </script>
 </body>
 </html>
-g
