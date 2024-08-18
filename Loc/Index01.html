@@ -3,79 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Capture</title>
+    <title>Location Tracker</title>
+    <style>
+        /* Inline CSS Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1c1c1c;
+            color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #2b2b2b;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #status {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Location Capture</h1>
-    <p id="status">Requesting location access...</p>
+
+    <div class="container">
+        <h1>Location Tracker</h1>
+        <button id="trackLocation">Track My Location</button>
+        <p id="status">Click the button to track your location.</p>
+    </div>
 
     <script>
-        // Function to handle errors
-        function handleError(error) {
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    document.getElementById("status").textContent = "User denied the request for Geolocation.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    document.getElementById("status").textContent = "Location information is unavailable.";
-                    break;
-                case error.TIMEOUT:
-                    document.getElementById("status").textContent = "The request to get user location timed out.";
-                    break;
-                case error.UNKNOWN_ERROR:
-                    document.getElementById("status").textContent = "An unknown error occurred.";
-                    break;
-            }
-        }
+        // JavaScript Code for Handling Geolocation
+        document.getElementById('trackLocation').addEventListener('click', function () {
+            const status = document.getElementById('status');
 
-        // Function to send location to PHP
-        function sendLocation(position) {
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
-
-            // Create a Google Maps link
-            var googleMapsLink = "https://www.google.com/maps?q=" + latitude + "," + longitude;
-
-            // Create a form and append latitude, longitude, and link as hidden inputs
-            var form = document.createElement("form");
-            form.method = "POST";
-            form.action = "capture.php";
-
-            var latInput = document.createElement("input");
-            latInput.type = "hidden";
-            latInput.name = "latitude";
-            latInput.value = latitude;
-
-            var lonInput = document.createElement("input");
-            lonInput.type = "hidden";
-            lonInput.name = "longitude";
-            lonInput.value = longitude;
-
-            var linkInput = document.createElement("input");
-            linkInput.type = "hidden";
-            linkInput.name = "googleMapsLink";
-            linkInput.value = googleMapsLink;
-
-            form.appendChild(latInput);
-            form.appendChild(lonInput);
-            form.appendChild(linkInput);
-
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        // Function to get the user's location
-        function captureLocation() {
             if (navigator.geolocation) {
-                document.getElementById("status").textContent = "Requesting location...";
-                navigator.geolocation.getCurrentPosition(sendLocation, handleError);
-            } else {
-                document.getElementById("status").textContent = "Geolocation is not supported by this browser.";
-            }
-        }
+                status.textContent = 'Tracking location...';
 
-        // Automatically request location on page load
-        window.onload = captureLocation;
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        status.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+
+                        // Send location data to the server
+                        sendLocationData(latitude, longitude);
+                    },
+                    (error) => {
+                        status.textContent = 'Unable to retrieve your location.';
+                    }
+                );
+            } else {
+                status.textContent = 'Geolocation is not supported by your browser.';
+            }
+        });
+
+        function sendLocationData(latitude, longitude) {
+            fetch('save_location.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    latitude: latitude,
+                    longitude: longitude
+                })
+            })
+            .then(response => response.text())
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+        }
     </script>
+
 </body>
 </html>
