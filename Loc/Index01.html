@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Tracker</title>
+    <title>Save Location Details</title>
     <style>
-        /* Inline CSS Styles */
         body {
             font-family: Arial, sans-serif;
             background-color: #1c1c1c;
@@ -48,13 +47,12 @@
 <body>
 
     <div class="container">
-        <h1>Location Tracker</h1>
+        <h1>Save Location Details</h1>
         <button id="trackLocation">Track My Location</button>
-        <p id="status">Click the button to track your location.</p>
+        <p id="status">Click the button to track your location and save it to a file.</p>
     </div>
 
     <script>
-        // JavaScript Code for Handling Geolocation
         document.getElementById('trackLocation').addEventListener('click', function () {
             const status = document.getElementById('status');
 
@@ -64,10 +62,10 @@
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const { latitude, longitude } = position.coords;
-                        status.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+                        status.textContent = `Location tracked successfully. Saving to file...`;
 
-                        // Send location data to the server
-                        sendLocationData(latitude, longitude);
+                        const locationData = `Latitude: ${latitude}, Longitude: ${longitude}\n`;
+                        saveToFile(locationData);
                     },
                     (error) => {
                         status.textContent = 'Unable to retrieve your location.';
@@ -78,20 +76,12 @@
             }
         });
 
-        function sendLocationData(latitude, longitude) {
-            fetch('save_location.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    latitude: latitude,
-                    longitude: longitude
-                })
-            })
-            .then(response => response.text())
-            .then(data => console.log(data))
-            .catch(error => console.error('Error:', error));
+        function saveToFile(data) {
+            const blob = new Blob([data], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'contact.txt';
+            link.click();
         }
     </script>
 
