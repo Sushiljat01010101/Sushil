@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Background Remover</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: #fff;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px 20px;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            margin-top: 70px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .hero img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .hero h1 {
+            font-size: 28px;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #555;
+        }
+
+        .upload-container {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .upload-button {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-button input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .steps-container {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .step {
+            background-color: #e7f0ff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        }
+
+        .step h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .step p {
+            font-size: 16px;
+            color: #555;
+        }
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            animation: scale-up 0.3s ease-out;
+        }
+
+        @keyframes scale-up {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .loading-spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-image {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .buttons button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .download-button {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .share-button {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pixelcut - Free Background Remover</h1>
+    </header>
+    <div class="container">
+        <div class="hero">
+            <img src="https://via.placeholder.com/800x400.png" alt="Image with removed background">
+            <h1>Free image background remover</h1>
+            <p>Our AI background remover instantly removes the background of your photos in seconds. Then you can add any new background or leave it transparent!</p>
+        </div>
+
+        <div class="upload-container">
+            <button class="upload-button">
+                Upload Image
+                <input type="file" id="upload-image" accept="image/*">
+            </button>
+        </div>
+
+        <div class="steps-container">
+            <div class="step">
+                <h2>1. Upload your Image</h2>
+                <p>Choose a JPG, PNG, or HEIC file to upload. Ensure the image has clear edges for the best results.</p>
+            </div>
+            <div class="step">
+                <h2>2. Automatically remove background online</h2>
+                <p>Our tool will automatically remove the background from your image. Once complete, you can refine the cutout if necessary.</p>
+            </div>
+            <div class="step">
+                <h2>3. Download or save new image as PNG file with no background</h2>
+                <p>Download your new cutout image to share, or keep editing and add new background details.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loadingModal')">&times;</span>
+            <div class="loading-spinner"></div>
+            <p>Processing your image, please wait...</p>
+        </div>
+    </div>
+
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('resultModal')">&times;</span>
+            <img id="result-image" class="result-image" src="" alt="Result Image">
+            <div class="buttons">
+                <button class="download-button" id="download-button">Download</button>
+                <button class="share-button" id="share-button">Share</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 Pixelcut. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById('upload-image').addEventListener('change', () => {
+            const fileInput = document.getElementById('upload-image');
+            const file = fileInput.files[0];
+
+            if (file) {
+                // Show the loading modal
+                showModal('loadingModal');
+
+                // Create a new FormData object to send the file to the API
+                const formData = new FormData();
+                formData.append('image_file', file);
+
+                // Use the remove.bg API for background removal
+                fetch('https://api.remove.bg/v1.0/removebg', {
+                    method: 'POST',
+                    headers: {
+                        'X-Api-Key': '6Vdmfg65nHNhLZox1ueARpmD',  // Replace with your actual API key
+                    },
+                    body: formData
+                })
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    document.getElementById('result-image').src = url;
+                    closeModal('loadingModal');
+                    showModal('resultModal');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    closeModal('loadingModal');
+                    alert('Failed to process image. Please try again.');
+                });
+            }
+        });
+
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+        }
+
+        document.getElementById('download-button').addEventListener('click', () => {
+            const img = document.getElementById('result-image');
+            const link = document.createElement('a');
+            link.href = img.src;
+            link.download = 'removed-background.png';
+            link.click();
+        });
+
+        document.getElementById('share-button').addEventListener('click', () => {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Check out this image!',
+                    text: 'I used Pixelcut to remove the background of this image.',
+                    url: document.getElementById('result-image').src,
+                })
+                .then(() => console.log('Successful share'))
+                .catch(error => console.log('Error sharing:', error));
+            } else {
+                alert('Your browser does not support the Web Share API.');
+            }
+        });
+    </script>
+</body>
+</html>
