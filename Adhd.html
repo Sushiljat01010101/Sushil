@@ -215,7 +215,7 @@
             taskElement.innerHTML = `
                 <span>${taskText}</span>
                 <span>
-                    <span class="checkmark ${completed ? 'checked' : ''}" onclick="toggleTaskComplete(this)">✔</span>
+                    <span class="checkmark ${completed ? 'checked' : ''}" onclick="toggleTaskComplete(this)">✔️</span>
                     <button onclick="removeTask(this)">Delete</button>
                 </span>
             `;
@@ -273,7 +273,7 @@
         function updateTimerDisplay() {
             const minutes = Math.floor(time / 60).toString().padStart(2, '0');
             const seconds = (time % 60).toString().padStart(2, '0');
-            document.getElementById('focus-timer').textContent = ${minutes}:${seconds};
+            document.getElementById('focus-timer').textContent = `${minutes}:${seconds}`;
         }
 
         function timerComplete() {
@@ -286,7 +286,7 @@
 
         /* Mood Tracker Logic */
         function selectMood(element, mood) {
-            document.getElementById('selected-mood').textContent = Selected Mood: ${mood};
+            document.getElementById('selected-mood').textContent = `Selected Mood: ${mood}`;
             document.querySelectorAll('.emoji').forEach(emoji => emoji.classList.remove('active'));
             element.classList.add('active');
         }
