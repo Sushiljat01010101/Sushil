@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Diamond Animation with Security</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(45deg, #0f2027, #203a43, #2c5364);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      text-align: center;
+      position: relative;
+      color: white;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: fadeIn 3s ease-in-out;
+    }
+
+    .diamond-wrapper {
+      perspective: 1000px;
+      width: 200px;
+      height: 200px;
+      margin: 0 auto;
+    }
+
+    .diamond {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      transform-style: preserve-3d;
+      animation: rotate 10s infinite linear;
+    }
+
+    .diamond div {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: linear-gradient(135deg, #b3f0ff, #004d73);
+      opacity: 0.9;
+      border: 2px solid #fff;
+      transform-origin: center;
+      clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    }
+
+    .diamond div:nth-child(1) {
+      transform: rotateX(0deg) translateZ(100px);
+    }
+
+    .diamond div:nth-child(2) {
+      transform: rotateY(90deg) translateZ(100px);
+    }
+
+    .diamond div:nth-child(3) {
+      transform: rotateY(180deg) translateZ(100px);
+    }
+
+    .diamond div:nth-child(4) {
+      transform: rotateY(270deg) translateZ(100px);
+    }
+
+    .button {
+      margin-top: 20px;
+      display: inline-block;
+      padding: 12px 24px;
+      background: linear-gradient(90deg, #ff7e5f, #feb47b);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: none; /* Hidden by default */
+    }
+
+    .button.show {
+      display: inline-block; /* Show after 7 taps */
+    }
+
+    .tap-count {
+      font-size: 1.2rem;
+      margin-top: 20px;
+      opacity: 0.8;
+    }
+
+    @keyframes rotate {
+      0% {
+        transform: rotateY(0deg);
+      }
+      100% {
+        transform: rotateY(360deg);
+      }
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>3D Diamond Animation</h1>
+    <div class="diamond-wrapper" id="tapArea">
+      <div class="diamond">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+    <button class="button" id="unlockButton" onclick="navigateToPage()">Unlock URL</button>
+    <p class="tap-count" id="tapMessage">.</p>
+  </div>
+
+  <script>
+    let tapCount = 0; // Counter for taps
+
+    // Reference elements
+    const tapArea = document.getElementById("tapArea");
+    const unlockButton = document.getElementById("unlockButton");
+    const tapMessage = document.getElementById("tapMessage");
+
+    // Handle taps
+    tapArea.addEventListener("click", () => {
+      tapCount++;
+      if (tapCount < 15) {
+        
+      } else {
+        tapMessage.textContent = "Link unlocked! Click the button below.";
+        unlockButton.classList.add("show"); // Show the unlock button
+      }
+    });
+
+    // Navigate to URL
+    function navigateToPage() {
+      alert('Navigating to the URL...');
+      window.location.href = 'https://www.example.com'; // Replace with your URL
+    }
+  </script>
+</body>
+</html>
