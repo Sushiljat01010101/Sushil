@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Button Addition with Delete Option</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f9f9f9; /* Light gray background */
+      color: #333; /* Dark gray text for readability */
+      margin: 0;
+      padding: 0;
+    }
+
+    .button-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* Two buttons per row */
+      gap: 15px; /* Space between buttons */
+      padding: 20px;
+      background: #fff; /* White background for buttons container */
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+      margin: 20px auto;
+      max-width: 90%;
+    }
+
+    .button-container button {
+      padding: 10px 20px;
+      background-color: #000; /* Black background for buttons */
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #fff; /* White text */
+      font-size: 1em;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .button-container button:hover {
+      background-color: #333; /* Dark gray hover effect */
+      transform: scale(1.05); /* Slight zoom effect */
+    }
+
+    .input-container {
+      padding: 20px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin: 20px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 90%;
+    }
+
+    .input-container input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #f5f5f5; /* Light background for inputs */
+      color: #333;
+      font-size: 1em;
+    }
+
+    .input-container button {
+      padding: 10px 20px;
+      background-color: #000; /* Black background for buttons */
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #fff; /* White text */
+      font-size: 1em;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .input-container button:hover {
+      background-color: #333; /* Dark gray hover effect */
+      transform: scale(1.05);
+    }
+
+    .delete-button {
+      background-color: #000; /* Black delete button */
+      border-radius: 50%;
+      padding: 5px 10px;
+      margin-left: 10px;
+      color: #fff;
+      font-size: 1em;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s ease;
+    }
+
+    .delete-button:hover {
+      background-color: #333; /* Dark gray hover effect for delete */
+    }
+
+    .select-all-container {
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin: 20px auto;
+      max-width: 90%;
+    }
+
+    .select-all-container input {
+      margin-right: 10px;
+    }
+
+    .select-all-container button {
+      background-color: #000; /* Black background */
+      color: #fff; /* White text */
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .select-all-container button:hover {
+      background-color: #333; /* Dark gray hover effect */
+    }
+  </style>
+</head>
+<body>
+  <!-- Input for adding buttons -->
+  <div class="input-container">
+    <input type="text" id="button-name" placeholder="Enter Button Name">
+    <input type="text" id="button-link" placeholder="Enter Button Link">
+    <button onclick="addButton()">Add Button</button>
+  </div>
+
+  <!-- Select All and Delete Selected Buttons -->
+  <div class="select-all-container">
+    <input type="checkbox" id="select-all" onclick="toggleSelectAll()"> 
+    <label for="select-all">Select All</label>
+    <button onclick="deleteSelected()">Delete Selected</button>
+  </div>
+
+  <!-- Container to hold dynamically added buttons -->
+  <div class="button-container" id="button-container"></div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyCNnemXpvrBmqFcg48FXH_5xDVDvJOFMDw",
+      authDomain: "xhunter-4fad8.firebaseapp.com",
+      databaseURL: "https://xhunter-4fad8-default-rtdb.firebaseio.com",
+      projectId: "xhunter-4fad8",
+      storageBucket: "xhunter-4fad8.appspot.com",
+      messagingSenderId: "855941951170",
+      appId: "1:855941951170:web:9107a972f93f0a1e7d555b",
+      measurementId: "G-PXVNK16SN7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.firestore();
+
+    function addButton() {
+      var buttonName = document.getElementById('button-name').value.trim();
+      var buttonLink = document.getElementById('button-link').value.trim();
+
+      if (buttonName && buttonLink) {
+        db.collection('buttons').add({
+          name: buttonName,
+          link: buttonLink
+        })
+        .then(function() {
+          console.log("Button added successfully!");
+          loadButtons();
+        })
+        .catch(function(error) {
+          console.error("Error adding button: ", error);
+        });
+      }
+    }
+
+    function deleteButton(buttonId) {
+      db.collection('buttons').doc(buttonId).delete().then(function() {
+        console.log("Button deleted successfully!");
+        loadButtons();
+      }).catch(function(error) {
+        console.error("Error deleting button: ", error);
+      });
+    }
+
+    function deleteSelected() {
+      const selectedButtons = document.querySelectorAll('.button-checkbox:checked');
+      selectedButtons.forEach(function(checkbox) {
+        const buttonId = checkbox.getAttribute('data-id');
+        deleteButton(buttonId);
+      });
+    }
+
+    function toggleSelectAll() {
+      const isChecked = document.getElementById('select-all').checked;
+      const checkboxes = document.querySelectorAll('.button-checkbox');
+      checkboxes.forEach(function(checkbox) {
+        checkbox.checked = isChecked;
+      });
+    }
+
+    function loadButtons() {
+      db.collection('buttons').get().then(function(querySnapshot) {
+        var buttonContainer = document.getElementById('button-container');
+        buttonContainer.innerHTML = ''; 
+
+        querySnapshot.forEach(function(doc) {
+          var buttonData = doc.data();
+          var buttonWrapper = document.createElement('div');
+          
+          var checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.classList.add('button-checkbox');
+          checkbox.setAttribute('data-id', doc.id);
+
+          var buttonElement = document.createElement('button');
+          buttonElement.textContent = buttonData.name;
+          buttonElement.onclick = function() {
+            window.location.href = buttonData.link;
+          };
+
+          buttonWrapper.appendChild(checkbox);
+          buttonWrapper.appendChild(buttonElement);
+          buttonContainer.appendChild(buttonWrapper);
+        });
+      });
+    }
+
+    window.onload = function() {
+      loadButtons();
+    };
+  </script>
+</body>
+</html>
