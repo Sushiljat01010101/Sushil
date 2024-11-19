@@ -13,6 +13,39 @@
       padding: 0;
     }
 
+    .logo-container {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+  height: 100px; /* Adjust as per your need */
+  margin: 20px auto; /* Auto margin for additional centering */
+
+    }
+
+    .logo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: url('https://firebasestorage.googleapis.com/v0/b/sushiljat01-af741.appspot.com/o/IMG_20240712_174716.jpg?alt=media&token=18faad2e-871c-4368-bf55-c077d1b8bf6b') no-repeat center/cover; /* Replace with your image URL */
+      box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2); /* Shadow effect */
+      animation: float 3s infinite ease-in-out; /* Float animation */
+      transform: perspective(500px) rotateX(0deg) rotateY(0deg); /* 3D effect */
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .logo:hover {
+      transform: perspective(500px) rotateX(15deg) rotateY(15deg); /* 3D tilt on hover */
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
     .button-container {
       display: grid;
       grid-template-columns: repeat(2, 1fr); /* Two buttons per row */
@@ -125,6 +158,11 @@
   </style>
 </head>
 <body>
+  <!-- Round Animated Logo -->
+  <div class="logo-container">
+    <div class="logo"></div>
+  </div>
+
   <!-- Input for adding buttons -->
   <div class="input-container">
     <input type="text" id="button-name" placeholder="Enter Button Name">
