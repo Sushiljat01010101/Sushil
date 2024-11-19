@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Diamond Animation with Security</title>
+  <title>3D Diamond Animation with Security and Speed Control</title>
   <style>
     /* General Reset */
     * {
@@ -20,6 +20,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column;
     }
 
     .container {
@@ -78,7 +79,6 @@
 
     .button {
       margin-top: 20px;
-      display: inline-block;
       padding: 12px 24px;
       background: linear-gradient(90deg, #ff7e5f, #feb47b);
       color: white;
@@ -87,11 +87,14 @@
       font-size: 1rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      display: none; /* Hidden by default */
     }
 
     .button.show {
-      display: inline-block; /* Show after 7 taps */
+      display: inline-block;
+    }
+
+    .button.hidden {
+      display: none;
     }
 
     .tap-count {
@@ -123,41 +126,57 @@
   <div class="container">
     <h1>3D Diamond Animation</h1>
     <div class="diamond-wrapper" id="tapArea">
-      <div class="diamond">
+      <div class="diamond" id="diamond">
         <div></div>
         <div></div>
         <div></div>
         <div></div>
       </div>
     </div>
-    <button class="button" id="unlockButton" onclick="navigateToPage()">Unlock URL</button>
+    <button class="button hidden" id="unlockButton" onclick="navigateToPage()">Unlock URL</button>
     <p class="tap-count" id="tapMessage">.</p>
+    <button class="button" id="speedButton">Increase Speed</button>
   </div>
 
   <script>
     let tapCount = 0; // Counter for taps
+    let rotationSpeed = 5; // Initial rotation speed (in seconds)
 
     // Reference elements
     const tapArea = document.getElementById("tapArea");
     const unlockButton = document.getElementById("unlockButton");
     const tapMessage = document.getElementById("tapMessage");
+    const speedButton = document.getElementById("speedButton");
+    const diamond = document.getElementById("diamond");
 
     // Handle taps
     tapArea.addEventListener("click", () => {
       tapCount++;
       if (tapCount < 15) {
-        
+        tapMessage.textContent = ``; // Show progress
       } else {
         tapMessage.textContent = "Link unlocked! Click the button below.";
-        unlockButton.classList.add("show"); // Show the unlock button
+        unlockButton.classList.remove("hidden"); // Show the unlock button
+        unlockButton.classList.add("show");
       }
     });
 
     // Navigate to URL
     function navigateToPage() {
-      alert('Navigating to the URL...');
+      
       window.location.href = 'https://sushiljat01010101.github.io/Sushil/Hidandoc/button%20upload.html'; // Replace with your URL
     }
+
+    // Handle button click to increase speed
+    speedButton.addEventListener("click", () => {
+      rotationSpeed -= 1; // Decrease time (faster rotation)
+      if (rotationSpeed < 1) rotationSpeed = 1; // Limit speed to prevent too fast rotation
+
+      // Update the animation speed
+      diamond.style.animation = `rotate ${rotationSpeed}s infinite linear`;
+
+     
+    });
   </script>
 </body>
 </html>
