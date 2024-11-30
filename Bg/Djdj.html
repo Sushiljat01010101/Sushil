@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <style>
+    /* Basic styles for the admin panel */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f0f0f0;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 90%;
+      margin: 20px auto;
+    }
+    .navbar {
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+    }
+    .navbar a {
+      color: #fff;
+      margin: 0 10px;
+      text-decoration: none;
+    }
+    .section {
+      margin-top: 20px;
+    }
+    .card {
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    .card button {
+      padding: 10px;
+      background-color: #00bcd4;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #fff;
+    }
+    .card button:hover {
+      background-color: #0097a7;
+    }
+    .room-list, .user-list, .message-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    .room-item, .user-item, .message-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .message-item button, .user-item button {
+      background-color: #ff4d4d;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <h2>Admin Panel</h2>
+    <a href="#rooms">Rooms</a>
+    <a href="#users">Users</a>
+    <a href="#messages">Messages</a>
+    <a href="#logout" onclick="logout()">Logout</a>
+  </div>
+
+  <div class="container">
+    <!-- Rooms Section -->
+    <div id="rooms" class="section">
+      <div class="card">
+        <h3>Chat Rooms</h3>
+        <ul id="room-list" class="room-list">
+          <!-- Rooms will be listed here -->
+        </ul>
+        <button onclick="createRoom()">Create Room</button>
+      </div>
+    </div>
+
+    <!-- Users Section -->
+    <div id="users" class="section">
+      <div class="card">
+        <h3>Users</h3>
+        <ul id="user-list" class="user-list">
+          <!-- Users will be listed here -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- Messages Section -->
+    <div id="messages" class="section">
+      <div class="card">
+        <h3>Messages</h3>
+        <ul id="message-list" class="message-list">
+          <!-- Messages will be listed here -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyCNnemXpvrBmqFcg48FXH_5xDVDvJOFMDw",
+      authDomain: "xhunter-4fad8.firebaseapp.com",
+      databaseURL: "https://xhunter-4fad8-default-rtdb.firebaseio.com",
+      projectId: "xhunter-4fad8",
+      storageBucket: "xhunter-4fad8.appspot.com",
+      messagingSenderId: "855941951170",
+      appId: "1:855941951170:web:9107a972f93f0a1e7d555b",
+      measurementId: "G-PXVNK16SN7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // Admin Authentication
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = 'login.html'; // Redirect to login page if not logged in
+      }
+    });
+
+    // Logout function
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.href = 'login.html'; // Redirect to login page on logout
+      });
+    }
+
+    // Room Management
+    function createRoom() {
+      const roomName = prompt('Enter Room Name:');
+      if (roomName) {
+        db.collection('rooms').add({
+          name: roomName,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    }
+
+    function deleteRoom(roomId) {
+      db.collection('rooms').doc(roomId).delete();
+    }
+
+    function loadRooms() {
+      db.collection('rooms').onSnapshot(snapshot => {
+        const roomList = document.getElementById('room-list');
+        roomList.innerHTML = ''; // Clear current list
+        snapshot.forEach(doc => {
+          const room = doc.data();
+          const li = document.createElement('li');
+          li.className = 'room-item';
+          li.innerHTML = `${room.name} <button onclick="deleteRoom('${doc.id}')">Delete</button>`;
+          roomList.appendChild(li);
+        });
+      });
+    }
+
+    // User Management
+    function loadUsers(roomId) {
+      db.collection('rooms').doc(roomId).collection('users').onSnapshot(snapshot => {
+        const userList = document.getElementById('user-list');
+        userList.innerHTML = ''; // Clear current list
+        snapshot.forEach(doc => {
+          const user = doc.id;
+          const li = document.createElement('li');
+          li.className = 'user-item';
+          li.innerHTML = `${user} <button onclick="banUser('${roomId}', '${user}')">Ban</button>`;
+          userList.appendChild(li);
+        });
+      });
+    }
+
+    function banUser(roomId, username) {
+      db.collection('rooms').doc(roomId).collection('users').doc(username).delete();
+    }
+
+    // Messages Management
+    function loadMessages(roomId) {
+      db.collection('rooms').doc(roomId).collection('messages').onSnapshot(snapshot => {
+        const messageList = document.getElementById('message-list');
+        messageList.innerHTML = ''; // Clear current list
+        snapshot.forEach(doc => {
+          const message = doc.data();
+          const li = document.createElement('li');
+          li.className = 'message-item';
+          li.innerHTML = `${message.username}: ${message.message} <button onclick="deleteMessage('${roomId}', '${doc.id}')">Delete</button>`;
+          messageList.appendChild(li);
+        });
+      });
+    }
+
+    function deleteMessage(roomId, messageId) {
+      db.collection('rooms').doc(roomId).collection('messages').doc(messageId).delete();
+    }
+
+    window.onload = function() {
+      loadRooms(); // Load rooms when page loads
+    }
+  </script>
+</body>
+</html>
+
