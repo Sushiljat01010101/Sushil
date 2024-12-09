@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Auth with Firebase</title>
+    <!-- Google Fonts for better UI -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- External Style -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #007bff, #00c6ff);
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 30px;
+            width: 350px;
+            max-width: 100%;
+            animation: slide-up 0.5s ease-in-out;
+        }
+        @keyframes slide-up {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4285F4;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #357ae8;
+        }
+        img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        .profile {
+            margin-top: 20px;
+            display: none;
+        }
+        .profile img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+    </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Sign in with Google</h1>
+        <button id="googleSignIn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo">
+            Sign in with Google
+        </button>
+        <div class="profile" id="profileInfo">
+            <img id="userPhoto" alt="User Photo">
+            <h3 id="userName"></h3>
+            <p id="userEmail"></p>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNnemXpvrBmqFcg48FXH_5xDVDvJOFMDw",
+  authDomain: "xhunter-4fad8.firebaseapp.com",
+  databaseURL: "https://xhunter-4fad8-default-rtdb.firebaseio.com",
+  projectId: "xhunter-4fad8",
+  storageBucket: "xhunter-4fad8.appspot.com",
+  messagingSenderId: "855941951170",
+  appId: "1:855941951170:web:9107a972f93f0a1e7d555b",
+  measurementId: "G-PXVNK16SN7"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Google Authentication
+        document.getElementById('googleSignIn').addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    const user = result.user;
+                    document.getElementById('googleSignIn').style.display = 'none';
+                    document.getElementById('profileInfo').style.display = 'block';
+                    document.getElementById('userPhoto').src = user.photoURL;
+                    document.getElementById('userName').innerText = user.displayName;
+                    document.getElementById('userEmail').innerText = user.email;
+                })
+                .catch((error) => {
+                    console.error(error.message);
+                    alert('Error: ' + error.message);
+                });
+        });
+    </script>
+</body>
+</html>
