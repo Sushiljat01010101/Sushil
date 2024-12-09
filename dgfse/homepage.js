@@ -3,8 +3,14 @@ import {getAuth, onAuthStateChanged, signOut} from "https://www.gstatic.com/fire
 import{getFirestore, getDoc, doc} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js"
 
 const firebaseConfig = {
-    //YOUR COPIED FIREBASE PART SHOULD BE HERE
- //WATCH THIS VIDEO TO LEARN WHAT TO PUT HERE   https://youtu.be/_Xczf06n6x0
+   apiKey: "AIzaSyCNnemXpvrBmqFcg48FXH_5xDVDvJOFMDw",
+  authDomain: "xhunter-4fad8.firebaseapp.com",
+  databaseURL: "https://xhunter-4fad8-default-rtdb.firebaseio.com",
+  projectId: "xhunter-4fad8",
+  storageBucket: "xhunter-4fad8.appspot.com",
+  messagingSenderId: "855941951170",
+  appId: "1:855941951170:web:9107a972f93f0a1e7d555b",
+  measurementId: "G-PXVNK16SN7"
   };
  
   // Initialize Firebase
