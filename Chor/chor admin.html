@@ -158,11 +158,43 @@
       border: 4px solid #000;
     }
 
-    h1 {
-      font-size: 2rem;
-      text-transform: uppercase;
-      color: #333;
-    }
+     @keyframes float {
+            0% {
+                transform: translateX(-50%) perspective(1000px) rotateY(0deg) rotateX(0deg);
+            }
+            50% {
+                transform: translateX(-50%) perspective(1000px) rotateY(10deg) rotateX(5deg);
+            }
+            100% {
+                transform: translateX(-50%) perspective(1000px) rotateY(0deg) rotateX(0deg);
+            }
+        }
+        h4 {
+            font-size: 1rem;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease-in-out; /* Animation added */
+            animation: rainbow 5s linear infinite; /* Rainbow transition */
+            background: linear-gradient(90deg, #ff512f, #f09819, #fdbb2d, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
     .controls {
       margin-bottom: 20px;
@@ -226,6 +258,7 @@
     <img src="https://firebasestorage.googleapis.com/v0/b/sushiljat01-af741.appspot.com/o/IMG_20240712_174716.jpg?alt=media&token=18faad2e-871c-4368-bf55-c077d1b8bf6b" alt="Profile Logo">
     <h1>Admin Panel</h1>
       <h4>By Sushil Choudhary</h4>
+        <h5>https://youthub-video.odoo.com/Chor</h>
   </div>
 
   <div class="controls">
