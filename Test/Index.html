@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Code Host with Firebase</title>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+</head>
+<body>
+    <h1>Paste Your HTML Code</h1>
+    <textarea id="htmlCode" rows="10" cols="50" placeholder="Paste your HTML code here"></textarea><br>
+    <button onclick="uploadCode()">Generate Live Link</button>
+    <p id="linkOutput"></p>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQXDQ7as5SIIbHAsXuagTbgt89HcdvoKQ",
+            authDomain: "vido-e05d7.firebaseapp.com",
+            projectId: "vido-e05d7",
+            storageBucket: "vido-e05d7.appspot.com",
+            messagingSenderId: "169899782442",
+            appId: "1:169899782442:web:6beb259b6eba97e6972e53"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        async function uploadCode() {
+            const htmlCode = document.getElementById('htmlCode').value;
+            if (htmlCode.trim() === "") {
+                alert("Please paste some HTML code!");
+                return;
+            }
+
+            // Generate a unique ID using Date and Random number
+            const uniqueId = Date.now().toString() + Math.floor(Math.random() * 1000);
+
+            try {
+                // Save HTML code to Firestore
+                await db.collection('htmlPages').doc(uniqueId).set({
+                    code: htmlCode,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Generate live link
+                const link = `${window.location.origin}/view.html?id=${uniqueId}`;
+                document.getElementById('linkOutput').innerHTML = 
+                    `Your Live Link: <a href="${link}" target="_blank">${link}</a>`;
+            } catch (error) {
+                console.error("Error saving code: ", error);
+                alert("Error saving code. Please try again.");
+            }
+        }
+    </script>
+</body>
+</html>
+
