@@ -31,27 +31,28 @@
             text-align: center;
             overflow: auto; /* Allow the content to scroll if it overflows */
         }
-.footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 4px;
-    font-size: 16px;
-}
 
-.footer a {
-    color: #f39c12;
-    text-decoration: none;
-    font-weight: bold;
-}
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 4px;
+            font-size: 16px;
+        }
 
-.footer a:hover {
-    text-decoration: underline;
-}
+        .footer a {
+            color: #f39c12;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
 
         h2 {
             font-size: 26px;
@@ -197,6 +198,25 @@
             transform: scale(1.1);
         }
 
+        /* New styles for the logos */
+        .social-logos {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .social-logos img {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .social-logos img:hover {
+            transform: scale(1.2);
+        }
+
         /* Animations */
         @keyframes fadeIn {
             0% { opacity: 0; transform: translateY(30px); }
@@ -235,6 +255,12 @@
 
         <button class="copy-btn" id="copy4" onclick="copyToClipboard('pin4')">Copy 4-Digit PIN</button>
         <button class="copy-btn" id="copy6" onclick="copyToClipboard('pin6')">Copy 6-Digit PIN</button>
+
+        <!-- Social Media Links -->
+        <div class="social-logos">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/95/Instagram_logo_2022.svg" alt="Instagram" onclick="window.open('https://www.instagram.com/sushiljat01/', '_blank')">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" onclick="window.open('https://t.me/Gamaspyowner/', '_blank')">
+        </div>
     </div>
 
     <script>
@@ -305,7 +331,6 @@
     </script>
     <div class="footer">
     Made with ❤️ by <a href="https://sushiljat.odoo.com" target="_blank">Sushil Choudhary</a>
-</div>
-
+    </div>
 </body>
 </html>
