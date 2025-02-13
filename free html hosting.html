@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Hosting Platform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: linear-gradient(to right, #6a11cb, #2575fc); color: #fff; text-align: center; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    color: black; /* Text color black */
+}
+
+.footer a {
+    color: #ffcc00;
+    text-decoration: none;
+    font-weight: bold;
+
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+
+
+        
+        .login-container {
+            background: white; color: black; width: 300px; padding: 20px;
+            border-radius: 10px; box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        input, button {
+            width: 100%; padding: 10px; margin-top: 10px; border: none; border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .btn { background: #6a11cb; color: white; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: #4a07a5; }
+        
+        .container { width: 100%; height: 100%; background: #fff; border-radius: 10px; padding: 20px; color: #333; display: none; flex-direction: column; }
+        .tab-container { display: flex; justify-content: space-between; background: #6a11cb; padding: 10px; border-radius: 5px; }
+        .tab { flex: 1; background: none; border: none; color: white; font-size: 1.1em; padding: 10px; cursor: pointer; transition: 0.3s; }
+        .tab.active { background: #4a07a5; border-radius: 5px; }
+        
+        .section { display: none; flex: 1; overflow-y: auto; padding: 10px; }
+        .section.active { display: block; }
+        
+        textarea { width: 100%; height: 60vh; border: 1px solid #ccc; padding: 10px; border-radius: 5px; resize: none; font-family: monospace; }
+        
+        .upload-box { border: 2px dashed #6a11cb; padding: 20px; text-align: center; border-radius: 10px; cursor: pointer; }
+        
+        .upload-btn { background: #6a11cb; color: white; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; width: 100%; transition: 0.3s; }
+        
+        .loading-circle {
+            display: none; width: 40px; height: 40px; border-radius: 50%;
+            border: 5px solid rgba(255,255,255,0.3); border-top: 5px solid #4a07a5;
+            animation: spin 1s linear infinite; margin: auto;
+        }
+                /* New styles for the logos */
+        .social-logos {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: fixed;
+            bottom: 30;
+            width: 100%;
+        }
+
+        .social-logos img {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .social-logos img:hover {
+            transform: scale(1.2);
+        }
+        
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .result-container ul { list-style: none; }
+        .result-container ul li { display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f0f0f0; margin: 5px 0; border-radius: 5px; }
+        
+        .copy-btn { background: #2575fc; color: white; border: none; padding: 5px 5px; border-radius: 3px; cursor: pointer; font-size: 0.9em; }
+        .copy-btn {
+    background: #2575fc;
+    color: white;
+    border: none;
+    padding: 3px 6px; /* Smaller padding */
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8em; /* Smaller font size */
+    margin-left: 5px; /* Adds space between the file name and the button */
+    transition: 0.3s;
+}
+
+.copy-btn:hover {
+    background: #4a07a5;
+}
+
+    </style>
+</head>
+<body>
+
+<!-- Login Page -->
+<div class="login-container" id="login-container">
+    <h2>Enter Username</h2>
+    <input type="text" id="username" placeholder="Enter your username">
+    <button class="btn" onclick="login()">Proceed</button>
+</div>
+
+<!-- Main Container -->
+<div class="container" id="main-container">
+    <div class="tab-container">
+        <button class="tab active" onclick="changeTab(event, 'editor')">Editor</button>
+        <button class="tab" onclick="changeTab(event, 'upload')">Upload</button>
+        <button class="tab" onclick="changeTab(event, 'hosted')">Hosted Files</button>
+    </div>
+
+    <div class="section active" id="editor">
+        <h2>Free HTML Code Hosting </h2>
+        <textarea id="html-editor" placeholder="Write your HTML code here..."></textarea>
+        <button class="upload-btn" onclick="uploadFromEditor()">HOST YOUR CODE</button>
+        <div class="loading-circle" id="loading-circle"></div>
+    </div>
+
+    < <div class="section" id="upload">
+        <h2>Upload HTML File /Zip/img/mp4</h2>
+        <div class="upload-box" id="upload-box" onclick="document.getElementById('file-input').click()">
+            <p id="upload-text">Drag & Drop ZIP or HTML Here</p>
+            <input type="file" id="file-input" accept=".html,.zip,.png,.jpg,.jpeg" style="display: none;" onchange="showSelectedFile()">
+            <div class="file-preview" id="file-preview"></div>
+        </div>
+        <button class="btn" onclick="uploadFile()">HOST YOUR FILE</button>
+        <div class="loading-circle" id="loading-circle-file"></div>
+    </div>
+
+    <div class="section" id="hosted">
+        <h2>Your Hosted Files</h2>
+        <ul id="file-list"></ul>
+    </div>
+</div>
+        <div class="social-logos">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/95/Instagram_logo_2022.svg" alt="Instagram" onclick="window.open('https://www.instagram.com/sushiljat01/', '_blank')">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" onclick="window.open('https://t.me/Gamaspyowner/', '_blank')">
+        </div>
+    </div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+
+<script>
+    var firebaseConfig = {
+           apiKey: "AIzaSyAoGIzU5ofvO4tXoilKL6JbI1bKXgMfecs",
+  authDomain: "autobot-5024c.firebaseapp.com",
+  databaseURL: "https://autobot-5024c-default-rtdb.firebaseio.com",
+  projectId: "autobot-5024c",
+  storageBucket: "autobot-5024c.appspot.com",
+  messagingSenderId: "771991453771",
+  appId: "1:771991453771:web:6056a7545401a7087e8dce",
+  measurementId: "G-9K9X44KDZF"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    var storage = firebase.storage();
+    let username = "";
+
+    function login() {
+        username = document.getElementById('username').value.trim();
+        if (username) {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('main-container').style.display = 'block';
+            loadUserFiles();
+        } else {
+            alert("Please enter a valid username.");
+        }
+    }
+
+    function changeTab(event, tab) {
+        document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+        document.getElementById(tab).classList.add('active');
+        document.querySelectorAll('.tab').forEach(tabBtn => tabBtn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+    function showSelectedFile() {
+        let fileInput = document.getElementById('file-input');
+        let filePreview = document.getElementById('file-preview');
+        let uploadText = document.getElementById('upload-text');
+
+        if (fileInput.files.length > 0) {
+            let file = fileInput.files[0];
+            uploadText.style.display = 'none';
+            filePreview.style.display = 'block';
+            filePreview.innerHTML = `<p>${file.name}</p>`;
+        }
+    }
+
+    function uploadFromEditor() {
+        var htmlCode = document.getElementById('html-editor').value;
+        if (!htmlCode.trim()) return alert("Please enter HTML code.");
+        
+        document.getElementById('loading-circle').style.display = 'block';
+        var blob = new Blob([htmlCode], { type: "text/html" });
+        var fileRef = storage.ref(`${username}/${Date.now()}.html`);
+
+        fileRef.put(blob).then(snapshot => fileRef.getDownloadURL()).then(url => {
+            alert("File Uploaded: " + url);
+            loadUserFiles();
+            // Redirect to hosted files section after upload is successful
+            changeTab(event, 'hosted');
+        }).finally(() => {
+            document.getElementById('loading-circle').style.display = 'none';
+        });
+    }
+
+    function uploadFile() {
+        var file = document.getElementById('file-input').files[0];
+        if (!file) return alert('Please select a file.');
+
+        document.getElementById('loading-circle-file').style.display = 'block';
+        var fileRef = storage.ref(`${username}/${file.name}`);
+
+        fileRef.put(file).then(snapshot => fileRef.getDownloadURL()).then(url => {
+            alert("File Uploaded: " + url);
+            loadUserFiles();
+            // Redirect to hosted files section after upload is successful
+            changeTab(event, 'hosted');
+        }).finally(() => {
+            document.getElementById('loading-circle-file').style.display = 'none';
+        });
+    }
+
+    function loadUserFiles() {
+  var userRef = storage.ref(username);
+  document.getElementById('file-list').innerHTML = "Loading...";
+
+  userRef.listAll().then(res => {
+    if (res.items.length === 0) {
+      document.getElementById('file-list').innerHTML = "<p>No files uploaded yet.</p>";
+    } else {
+      document.getElementById('file-list').innerHTML = "";
+      res.items.forEach(item => {
+        item.getDownloadURL().then(url => {
+          let fileItem = document.createElement('li');
+          fileItem.innerHTML = `<a href="${url}" target="_blank">${item.name}</a>
+            <button class="copy-btn" onclick="copyLink('${url}')">Copy Link</button>
+            <span class="delete-btn" onclick="deleteFile('${item.fullPath}')">❌</span>`;
+          document.getElementById('file-list').appendChild(fileItem);
+        });
+      });
+    }
+  });
+}
+
+function copyLink(url) {
+  navigator.clipboard.writeText(url).then(() => {
+    alert("Link copied to clipboard!");
+  }).catch(err => {
+    alert("Failed to copy link: " + err);
+  });
+}
+
+
+    function deleteFile(path) {
+      if (confirm("Are you sure you want to delete this file?")) {
+        storage.ref(path).delete().then(() => {
+            alert("File Deleted");
+            loadUserFiles();
+        }).catch(error => {
+            alert("Error deleting file: " + error.message);
+        });
+      }
+    }
+</script>
+<div class="footer">
+    Made with ❤️ by <a href="https://sushiljat.odoo.com" target="_blank">Sushil Choudhary</a>
+</div>
+
+
+</body>
+</html>
