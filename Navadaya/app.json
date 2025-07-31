@@ -1,0 +1,26 @@
+{
+  "name": "Navadaya Girls Hostel Management System",
+  "description": "A comprehensive web-based management system for girls' hostels with Firebase integration",
+  "repository": "https://github.com/yourusername/navadaya-hostel-management",
+  "keywords": ["flask", "firebase", "hostel-management", "python", "web-app"],
+  "image": "heroku/python",
+  "stack": "heroku-22",
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "SESSION_SECRET": {
+      "description": "Secret key for Flask sessions",
+      "generator": "secret"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "addons": []
+}
