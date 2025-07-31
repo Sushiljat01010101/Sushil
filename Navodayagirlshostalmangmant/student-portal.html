@@ -1,0 +1,2976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal - Navadaya Girls Hostel</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Modern Student Portal Styles */
+        .student-login {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .student-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><defs><radialGradient id="a" cx="50" cy="50" r="50"><stop offset="0" stop-color="white" stop-opacity=".1"/><stop offset="1" stop-color="white" stop-opacity="0"/></radialGradient></defs><circle fill="url(%23a)" cx="10" cy="10" r="10"/><circle fill="url(%23a)" cx="50" cy="5" r="8"/><circle fill="url(%23a)" cx="90" cy="15" r="6"/></svg>') repeat;
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+        
+        .login-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .login-header .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        }
+        
+        .login-header h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .login-header p {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .student-dashboard {
+            display: none;
+            padding: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: #f8f9fa;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem 0;
+        }
+        
+        .student-welcome {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .student-welcome::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .welcome-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .student-avatar {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 1rem;
+        }
+        
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-card h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 700;
+        }
+        
+        .stat-card p {
+            color: #666;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        .content-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .section-header i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-right: 1rem;
+        }
+        
+        .section-header h2 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .profile-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .info-item {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .info-item label {
+            font-weight: 600;
+            color: #555;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-item span {
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .notice-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .notice-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .notice-content {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+        
+        .notice-date {
+            font-size: 0.85rem;
+            color: #888;
+        }
+        
+        .complaint-form {
+            margin-top: 1rem;
+        }
+        
+        .complaint-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .complaint-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-resolved {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-in-progress {
+            background: #cce7ff;
+            color: #004085;
+        }
+        
+        .fees-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .fees-table th,
+        .fees-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .fees-table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .fees-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .fees-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .fees-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .fees-overdue {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .text-muted {
+            color: #6c757d;
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+        
+        .receipt-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .receipt-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 0.25rem;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Enhanced Responsive and Mobile-First Design */
+        .tabs {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .tab-buttons {
+            display: flex;
+            background: #f8f9fa;
+            padding: 0.5rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #666;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 2rem;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .enhanced-form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .enhanced-form-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+        
+        .enhanced-form-group input,
+        .enhanced-form-group select,
+        .enhanced-form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e8ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .enhanced-form-group input:focus,
+        .enhanced-form-group select:focus,
+        .enhanced-form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .enhanced-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .enhanced-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .enhanced-btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+        
+        .enhanced-complaint-form {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .enhanced-complaint-form h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .enhanced-notice-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .enhanced-notice-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        
+        .enhanced-notice-title {
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        
+        .enhanced-notice-content {
+            color: #666;
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+        
+        .enhanced-notice-date {
+            font-size: 0.85rem;
+            color: #999;
+            font-weight: 500;
+        }
+        
+        .enhanced-complaint-status {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        
+        .enhanced-status-open {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+        }
+        
+        .enhanced-status-in_progress {
+            background: linear-gradient(135deg, #d1ecf1 0%, #74b9ff 100%);
+            color: #0c5460;
+        }
+        
+        .enhanced-status-resolved {
+            background: linear-gradient(135deg, #d4edda 0%, #00b894 100%);
+            color: #155724;
+        }
+        
+        @media (max-width: 768px) {
+            .student-dashboard {
+                padding: 0.5rem;
+            }
+            
+            .student-welcome {
+                padding: 1.5rem;
+                text-align: center;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-stats {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .tab-buttons {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+            
+            .tab-btn {
+                min-width: auto;
+                padding: 0.75rem;
+            }
+            
+            .tab-content {
+                padding: 1rem;
+            }
+            
+            .logout-btn {
+                position: static;
+                margin: 1rem auto;
+                display: flex;
+                width: fit-content;
+            }
+            
+            .login-card {
+                margin: 1rem;
+                padding: 2rem;
+            }
+        }
+        
+        /* Enhanced Room and Leave Styles */
+        .enhanced-room-info {
+            display: grid;
+            gap: 2rem;
+        }
+        
+        .room-details-card,
+        .roommates-card,
+        .room-change-card,
+        .leave-application-form,
+        .leave-history {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+        }
+        
+        .room-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .room-info-item {
+            padding: 1rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .roommates-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .roommate-card {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe0e6 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #ffc0c7;
+            transition: all 0.3s ease;
+        }
+        
+        .roommate-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .roommate-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .leave-history-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #6c757d;
+            transition: all 0.3s ease;
+        }
+        
+        .leave-history-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .leave-status {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        
+        .leave-status.pending {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+        }
+        
+        .leave-status.approved {
+            background: linear-gradient(135deg, #d4edda 0%, #00b894 100%);
+            color: #155724;
+        }
+        
+        .leave-status.rejected {
+            background: linear-gradient(135deg, #f8d7da 0%, #e17055 100%);
+            color: #721c24;
+        }
+        
+        .room-change-history-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .roommates-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .room-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+            background: linear-gradient(135deg, #ee5a24 0%, #d63031 100%);
+        }
+        
+        .logout-btn:active {
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 1.5rem;
+                margin: 0.5rem;
+            }
+            
+            .student-welcome {
+                padding: 1rem;
+            }
+            
+            .stat-card {
+                padding: 1.5rem;
+            }
+            
+            .tab-content {
+                padding: 0.75rem;
+            }
+            
+            .enhanced-form-group input,
+            .enhanced-form-group select,
+            .enhanced-form-group textarea {
+                padding: 0.75rem;
+            }
+            
+            .room-details-card,
+            .roommates-card,
+            .room-change-card,
+            .leave-application-form {
+                padding: 1rem;
+            }
+            
+            .logout-btn {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Student Login Section -->
+    <div id="studentLogin" class="student-login">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap" style="font-size: 2rem; color: white;"></i>
+                </div>
+                <h1>Student Portal</h1>
+                <p>Navadaya Girls Hostel Management System</p>
+            </div>
+            
+            <form id="studentLoginForm">
+                <div class="form-group">
+                    <label for="studentName">Full Name</label>
+                    <input type="text" id="studentName" name="studentName" required placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="rollNumber">Roll Number</label>
+                    <input type="text" id="rollNumber" name="rollNumber" required placeholder="Enter your roll number">
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i> Login to Portal
+                </button>
+            </form>
+            
+            <div class="text-center" style="margin-top: 1rem;">
+                <small class="text-muted">
+                    Use the name and roll number provided during registration<br>
+                    <strong>Example:</strong> If registered as "John Doe" with roll "CS001", enter exactly "John Doe" and "CS001"
+                </small>
+            </div>
+            
+            <div class="text-center" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                <small style="color: #666;">
+                    <strong>Test Note:</strong> First add a student in admin panel, then use that student's exact name and roll number here
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Dashboard -->
+    <div id="studentDashboard" class="student-dashboard">
+        <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+        
+        <div class="student-welcome">
+            <div class="welcome-content">
+                <div class="student-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h1>Welcome, <span id="welcomeName"></span>!</h1>
+                <p>Roll Number: <span id="welcomeRoll"></span> | Room: <span id="studentRoomDisplay">Loading...</span></p>
+            </div>
+        </div>
+        
+        <div class="quick-stats">
+            <div class="stat-card">
+                <i class="fas fa-bed"></i>
+                <h3 id="roomNumber">-</h3>
+                <p>Room Number</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-rupee-sign"></i>
+                <h3 id="totalFees">₹0</h3>
+                <p>Total Fees</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-check-circle"></i>
+                <h3 id="paidFees">₹0</h3>
+                <p>Paid Amount</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3 id="pendingFees">₹0</h3>
+                <p>Pending Amount</p>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="showTab('profile')">
+                    <i class="fas fa-user"></i> Profile
+                </button>
+                <button class="tab-btn" onclick="showTab('room')">
+                    <i class="fas fa-home"></i> Room
+                </button>
+                <button class="tab-btn" onclick="showTab('fees')">
+                    <i class="fas fa-rupee-sign"></i> Fees
+                </button>
+                <button class="tab-btn" onclick="showTab('leave')">
+                    <i class="fas fa-calendar-alt"></i> Leave
+                </button>
+                <button class="tab-btn" onclick="showTab('complaints')">
+                    <i class="fas fa-comment-alt"></i> Complaints  
+                </button>
+                <button class="tab-btn" onclick="showTab('notices')">
+                    <i class="fas fa-bullhorn"></i> Notices
+                </button>
+                <button class="tab-btn" onclick="showTab('maintenance')">
+                    <i class="fas fa-tools"></i> Maintenance
+                </button>
+            </div>
+                
+                <!-- Profile Tab -->
+                <div id="profileTab" class="tab-content active">
+                    <div class="section-header">
+                        <i class="fas fa-user-circle"></i>
+                        <h2>Personal Information</h2>
+                    </div>
+                    <div id="profileInfo" class="profile-info">
+                        <!-- Profile information will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Room Tab -->
+                <div id="roomTab" class="tab-content">
+                    <div class="section-header">
+                        <i class="fas fa-home"></i>
+                        <h2>Room Information & Management</h2>
+                    </div>
+                    <div id="roomContent">
+                        <div class="enhanced-room-info">
+                            <div class="room-details-card">
+                                <h3><i class="fas fa-door-open"></i> Current Room Details</h3>
+                                <div id="currentRoomInfo" class="room-info-grid">
+                                    <!-- Current room info will be loaded here -->
+                                </div>
+                            </div>
+                            
+                            <div class="roommates-card">
+                                <h3><i class="fas fa-users"></i> Roommates</h3>
+                                <div id="roommatesList" class="roommates-list">
+                                    <!-- Roommates will be loaded here -->
+                                </div>
+                            </div>
+                            
+                            <div class="room-change-card">
+                                <h3><i class="fas fa-exchange-alt"></i> Room Change Request</h3>
+                                <div class="room-change-form">
+                                    <form id="roomChangeForm">
+                                        <div class="enhanced-form-group">
+                                            <label for="changeReason">Reason for Room Change</label>
+                                            <select id="changeReason" name="reason" required>
+                                                <option value="">Select Reason</option>
+                                                <option value="Medical Issues">🏥 Medical Issues</option>
+                                                <option value="Roommate Conflict">👥 Roommate Conflict</option>
+                                                <option value="Study Environment">📚 Study Environment</option>
+                                                <option value="Personal Preference">⚡ Personal Preference</option>
+                                                <option value="Other">📝 Other</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="enhanced-form-group">
+                                            <label for="preferredRoom">Preferred Room (Optional)</label>
+                                            <select id="preferredRoom" name="preferredRoom">
+                                                <option value="">Any Available Room</option>
+                                                <!-- Available rooms will be loaded here -->
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="enhanced-form-group">
+                                            <label for="changeDescription">Additional Details</label>
+                                            <textarea id="changeDescription" name="description" rows="3" placeholder="Please provide any additional information to support your request"></textarea>
+                                        </div>
+                                        
+                                        <button type="submit" class="enhanced-btn enhanced-btn-primary">
+                                            <i class="fas fa-paper-plane"></i> Submit Request
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <div id="roomChangeHistory" style="margin-top: 1.5rem;">
+                                    <h4>Previous Room Change Requests</h4>
+                                    <!-- Room change history will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Fees Tab -->
+                <div id="feesTab" class="tab-content">
+                    <div class="section-header">
+                        <i class="fas fa-receipt"></i>
+                        <h2>Fee Payment History</h2>
+                    </div>
+                    <div id="feesContent">
+                        <table class="fees-table">
+                            <thead>
+                                <tr>
+                                    <th>Fee Type</th>
+                                    <th>Period</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Due Date</th>
+                                    <th>Receipt</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feesTableBody">
+                                <!-- Fees data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Leave Tab -->
+                <div id="leaveTab" class="tab-content">
+                    <div class="section-header">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h2>Leave Applications</h2>
+                    </div>
+                    <div id="leaveContent">
+                        <div class="leave-application-form">
+                            <h3><i class="fas fa-calendar-plus"></i> Apply for Leave</h3>
+                            <form id="leaveApplicationForm">
+                                <div class="form-row">
+                                    <div class="enhanced-form-group">
+                                        <label for="leaveType">Leave Type</label>
+                                        <select id="leaveType" name="leaveType" required>
+                                            <option value="">Select Leave Type</option>
+                                            <option value="Medical Leave">🏥 Medical Leave</option>
+                                            <option value="Family Emergency">🚨 Family Emergency</option>
+                                            <option value="Academic Purpose">📚 Academic Purpose</option>
+                                            <option value="Personal Leave">👤 Personal Leave</option>
+                                            <option value="Festival/Event">🎉 Festival/Event</option>
+                                            <option value="Other">📝 Other</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="enhanced-form-group">
+                                        <label for="leaveDuration">Duration</label>
+                                        <select id="leaveDuration" name="duration" required>
+                                            <option value="">Select Duration</option>
+                                            <option value="Half Day">🕒 Half Day</option>
+                                            <option value="1 Day">📅 1 Day</option>
+                                            <option value="2-3 Days">📅 2-3 Days</option>
+                                            <option value="1 Week">📅 1 Week</option>
+                                            <option value="More than 1 Week">📅 More than 1 Week</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="enhanced-form-group">
+                                        <label for="leaveStartDate">From Date</label>
+                                        <input type="date" id="leaveStartDate" name="startDate" required>
+                                    </div>
+                                    
+                                    <div class="enhanced-form-group">
+                                        <label for="leaveEndDate">To Date</label>
+                                        <input type="date" id="leaveEndDate" name="endDate" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="enhanced-form-group">
+                                    <label for="leaveReason">Reason for Leave</label>
+                                    <textarea id="leaveReason" name="reason" rows="4" required placeholder="Please provide detailed explanation for your leave request"></textarea>
+                                </div>
+                                
+                                <div class="enhanced-form-group">
+                                    <label for="emergencyContact">Emergency Contact (during leave)</label>
+                                    <input type="tel" id="emergencyContact" name="emergencyContact" placeholder="Phone number where you can be reached">
+                                </div>
+                                
+                                <div class="enhanced-form-group">
+                                    <label for="parentApproval">
+                                        <input type="checkbox" id="parentApproval" name="parentApproval" required>
+                                        I have informed my parents/guardian about this leave application
+                                    </label>
+                                </div>
+                                
+                                <button type="submit" class="enhanced-btn enhanced-btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Submit Leave Application
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="leave-history" style="margin-top: 2rem;">
+                            <h3><i class="fas fa-history"></i> Leave History</h3>
+                            <div id="leaveHistoryList">
+                                <!-- Leave history will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Complaints Tab -->
+                <div id="complaintsTab" class="tab-content">
+                    <div class="section-header">
+                        <i class="fas fa-comment-dots"></i>
+                        <h2>My Complaints</h2>
+                    </div>
+                    
+                    <div class="enhanced-complaint-form">
+                        <h3><i class="fas fa-plus-circle"></i> Submit New Complaint</h3>
+                        <form id="newComplaintForm">
+                            <div class="enhanced-form-group">
+                                <label for="complaintCategory">Category</label>
+                                <select id="complaintCategory" name="category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Room Maintenance">🔧 Room Maintenance</option>
+                                    <option value="Food & Mess">🍽️ Food & Mess</option>
+                                    <option value="Facilities">🏢 Facilities</option>
+                                    <option value="Security">🔒 Security</option>
+                                    <option value="Cleanliness">🧹 Cleanliness</option>
+                                    <option value="WiFi/Internet">📶 WiFi/Internet</option>
+                                    <option value="Other">📝 Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="enhanced-form-group">
+                                <label for="complaintSubject">Subject</label>
+                                <input type="text" id="complaintSubject" name="subject" required placeholder="Brief description of your issue">
+                            </div>
+                            
+                            <div class="enhanced-form-group">
+                                <label for="complaintDescription">Description</label>
+                                <textarea id="complaintDescription" name="description" rows="4" required placeholder="Please provide detailed information about the issue, including your room number if applicable"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="enhanced-btn enhanced-btn-primary">
+                                <i class="fas fa-paper-plane"></i> Submit Complaint
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div style="margin-top: 2rem;">
+                        <h3>Previous Complaints</h3>
+                        <div id="complaintsHistory">
+                            <!-- Complaints history will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notices Tab -->
+                <div id="noticesTab" class="tab-content">
+                    <div class="section-header">
+                        <i class="fas fa-bullhorn"></i>
+                        <h2>Hostel Notices & Announcements</h2>
+                    </div>
+                    <div id="noticesTabContent">
+                        <!-- Notices will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Maintenance Tab -->
+                <div id="maintenanceTab" class="tab-content">
+                    <div class="section-header">
+                        <i class="fas fa-wrench"></i>
+                        <h2>Room Maintenance Requests</h2>
+                    </div>
+                    
+                    <div class="enhanced-complaint-form">
+                        <h3><i class="fas fa-wrench"></i> Submit Maintenance Request</h3>
+                        <form id="maintenanceForm">
+                            <div class="enhanced-form-group">
+                                <label for="maintenanceType">Request Type</label>
+                                <select id="maintenanceType" name="type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Electrical">⚡ Electrical Issues</option>
+                                    <option value="Plumbing">🚿 Plumbing Issues</option>
+                                    <option value="Furniture">🪑 Furniture Repair</option>
+                                    <option value="Cleaning">🧽 Deep Cleaning</option>
+                                    <option value="AC/Fan">❄️ AC/Fan Issues</option>
+                                    <option value="Window/Door">🚪 Window/Door Issues</option>
+                                    <option value="WiFi">📶 WiFi Issues</option>
+                                    <option value="Other">🔧 Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="enhanced-form-group">
+                                <label for="maintenancePriority">Priority Level</label>
+                                <select id="maintenancePriority" name="priority" required>
+                                    <option value="">Select Priority</option>
+                                    <option value="Low">🟢 Low - Can wait a few days</option>
+                                    <option value="Medium">🟡 Medium - Needs attention soon</option>
+                                    <option value="High">🟠 High - Important issue</option>
+                                    <option value="Urgent">🔴 Urgent - Immediate attention required</option>
+                                </select>
+                            </div>
+                            
+                            <div class="enhanced-form-group">
+                                <label for="maintenanceSubject">Subject</label>
+                                <input type="text" id="maintenanceSubject" name="subject" required placeholder="Brief description of the issue">
+                            </div>
+                            
+                            <div class="enhanced-form-group">
+                                <label for="maintenanceDescription">Detailed Description</label>
+                                <textarea id="maintenanceDescription" name="description" rows="4" required placeholder="Please provide detailed information about the maintenance issue including your room number"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="enhanced-btn enhanced-btn-primary">
+                                <i class="fas fa-tools"></i> Submit Maintenance Request
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div style="margin-top: 2rem;">
+                        <h3>Previous Requests</h3>
+                        <div id="maintenanceHistory">
+                            <!-- Maintenance history will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, query, where, getDocs, addDoc, orderBy, limit, doc, deleteDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDA6duS8SJ5Wr26qNxzBoge01Leestj-9o",
+            authDomain: "animal-planet-73497.firebaseapp.com",
+            databaseURL: "https://animal-planet-73497-default-rtdb.firebaseio.com",
+            projectId: "animal-planet-73497",
+            storageBucket: "animal-planet-73497.appspot.com",
+            messagingSenderId: "15025745338",
+            appId: "1:15025745338:web:f2d2e2644d822afea00183",
+            measurementId: "G-KP9582LMC3"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        class StudentPortal {
+            constructor() {
+                this.currentStudent = null;
+                this.initializeEventListeners();
+                this.testFirebaseConnection();
+            }
+            
+            initializeEventListeners() {
+                document.getElementById('studentLoginForm').addEventListener('submit', (e) => this.handleLogin(e));
+                document.getElementById('roomChangeForm').addEventListener('submit', (e) => this.submitRoomChangeRequest(e));
+                document.getElementById('leaveApplicationForm').addEventListener('submit', (e) => this.submitLeaveApplication(e));
+                document.getElementById('newComplaintForm').addEventListener('submit', (e) => this.submitComplaint(e));
+                document.getElementById('maintenanceForm').addEventListener('submit', (e) => this.submitMaintenanceRequest(e));
+            }
+            
+            async handleLogin(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('studentName').value.trim();
+                const rollNumber = document.getElementById('rollNumber').value.trim();
+                
+                if (!name || !rollNumber) {
+                    this.showNotification('Please enter both name and roll number', 'error');
+                    return;
+                }
+                
+                try {
+                    this.showNotification('Logging in...', 'info');
+                    console.log('Attempting login with:', { name, rollNumber });
+                    
+                    // Get all students and search manually
+                    const studentsRef = collection(db, 'students');
+                    const allStudentsSnapshot = await getDocs(studentsRef);
+                    
+                    console.log('Total students in database:', allStudentsSnapshot.size);
+                    
+                    if (allStudentsSnapshot.empty) {
+                        this.showNotification('No students found in database. Please add students through admin panel first.', 'error');
+                        return;
+                    }
+                    
+                    let studentFound = null;
+                    
+                    allStudentsSnapshot.forEach((doc) => {
+                        const student = doc.data();
+                        console.log('Checking student:', {
+                            id: doc.id,
+                            firstName: student.firstName,
+                            lastName: student.lastName,
+                            rollNumber: student.rollNumber
+                        });
+                        
+                        // Match roll number (case insensitive)
+                        const rollMatch = student.rollNumber?.toLowerCase() === rollNumber.toLowerCase();
+                        
+                        if (rollMatch) {
+                            // Match name (multiple patterns)
+                            const fullName = `${student.firstName || ''} ${student.lastName || ''}`.trim().toLowerCase();
+                            const inputName = name.toLowerCase().trim();
+                            
+                            const nameMatch = fullName === inputName || 
+                                           student.firstName?.toLowerCase() === inputName ||
+                                           student.lastName?.toLowerCase() === inputName;
+                            
+                            if (nameMatch) {
+                                studentFound = { id: doc.id, ...student };
+                                console.log('Student match found!', studentFound);
+                            } else {
+                                console.log('Roll number matched but name did not match:', {
+                                    expected: fullName,
+                                    input: inputName
+                                });
+                            }
+                        }
+                    });
+                    
+                    if (!studentFound) {
+                        this.showNotification('Login failed. Please check your name and roll number. Make sure they match exactly as registered in admin panel.', 'error');
+                        return;
+                    }
+                    
+                    console.log('Login successful for:', studentFound.firstName, studentFound.lastName);
+                    this.currentStudent = studentFound;
+                    
+                    // Save session after successful authentication
+                    saveSession(studentFound);
+                    
+                    this.showDashboard();
+                    await this.loadStudentData();
+                    
+                } catch (error) {
+                    console.error('Login error:', error);
+                    this.showNotification(`Login failed: ${error.message}`, 'error');
+                }
+            }
+            
+            async showDashboard() {
+                document.getElementById('studentLogin').style.display = 'none';
+                document.getElementById('studentDashboard').style.display = 'block';
+                
+                const fullName = `${this.currentStudent.firstName} ${this.currentStudent.lastName}`;
+                document.getElementById('welcomeName').textContent = fullName;
+                document.getElementById('welcomeRoll').textContent = this.currentStudent.rollNumber;
+                
+                // Update room display - fetch actual room number if assignedRoom contains document ID
+                await this.updateRoomDisplay();
+                
+                this.showNotification(`Welcome ${this.currentStudent.firstName}! Login successful.`, 'success');
+            }
+            
+            async updateRoomDisplay() {
+                try {
+                    if (!this.currentStudent.assignedRoom || this.currentStudent.assignedRoom === 'Not Assigned') {
+                        document.getElementById('roomNumber').textContent = 'Not Assigned';
+                        document.getElementById('studentRoomDisplay').textContent = 'Not Assigned';
+                        return;
+                    }
+                    
+                    // Check if assignedRoom looks like a Firebase document ID (long alphanumeric string)
+                    const isDocumentId = this.currentStudent.assignedRoom.length > 15 && /^[a-zA-Z0-9]+$/.test(this.currentStudent.assignedRoom);
+                    
+                    if (isDocumentId) {
+                        // It's a document ID, fetch the actual room number
+                        const roomDoc = await getDoc(doc(db, 'rooms', this.currentStudent.assignedRoom));
+                        if (roomDoc.exists()) {
+                            const roomData = roomDoc.data();
+                            const actualRoomNumber = roomData.roomNumber || 'Unknown';
+                            document.getElementById('roomNumber').textContent = actualRoomNumber;
+                            document.getElementById('studentRoomDisplay').textContent = actualRoomNumber;
+                            // Update the current student object with the correct room number
+                            this.currentStudent.actualRoomNumber = actualRoomNumber;
+                        } else {
+                            document.getElementById('roomNumber').textContent = 'Room not found';
+                            document.getElementById('studentRoomDisplay').textContent = 'Room not found';
+                        }
+                    } else {
+                        // It's already a room number
+                        document.getElementById('roomNumber').textContent = this.currentStudent.assignedRoom;
+                        document.getElementById('studentRoomDisplay').textContent = this.currentStudent.assignedRoom;
+                        this.currentStudent.actualRoomNumber = this.currentStudent.assignedRoom;
+                    }
+                } catch (error) {
+                    console.error('Error updating room display:', error);
+                    document.getElementById('roomNumber').textContent = 'Error loading room';
+                    document.getElementById('studentRoomDisplay').textContent = 'Error loading room';
+                }
+            }
+            
+            async loadStudentData() {
+                await Promise.all([
+                    this.loadProfileInfo(),
+                    this.loadRoomInfo(),
+                    this.loadFeesData(),
+                    this.loadLeaveHistory(),
+                    this.loadComplaintsHistory(),
+                    this.loadNotices(),
+                    this.loadMaintenanceHistory()
+                ]);
+            }
+            
+            loadProfileInfo() {
+                const profileInfo = document.getElementById('profileInfo');
+                const student = this.currentStudent;
+                
+                profileInfo.innerHTML = `
+                    <div class="info-item">
+                        <label>Full Name</label>
+                        <span>${student.firstName} ${student.lastName}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Roll Number</label>
+                        <span>${student.rollNumber}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Course</label>
+                        <span>${student.course}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Year</label>
+                        <span>${student.year}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Email</label>
+                        <span>${student.email}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Phone</label>
+                        <span>${student.phone}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Guardian Name</label>
+                        <span>${student.guardianName}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Guardian Phone</label>
+                        <span>${student.guardianPhone}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Address</label>
+                        <span>${student.address}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Room Assignment</label>
+                        <span>${student.assignedRoom ? `Room ${student.assignedRoom}` : 'Not Assigned'}</span>
+                    </div>
+                `;
+                
+                // Update room number in stats
+                document.getElementById('roomNumber').textContent = student.assignedRoom || 'Not Assigned';
+            }
+            
+            async loadFeesData() {
+                try {
+                    const feesRef = collection(db, 'fees');
+                    const q = query(feesRef, where('studentId', '==', this.currentStudent.id));
+                    const querySnapshot = await getDocs(q);
+                    
+                    const fees = [];
+                    querySnapshot.forEach((doc) => {
+                        fees.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    // Calculate totals
+                    const totalFees = fees.reduce((sum, fee) => sum + fee.amount, 0);
+                    const paidFees = fees.filter(f => f.status === 'paid').reduce((sum, fee) => sum + fee.amount, 0);
+                    const pendingFees = totalFees - paidFees;
+                    
+                    // Update stats
+                    document.getElementById('totalFees').textContent = `₹${totalFees.toLocaleString()}`;
+                    document.getElementById('paidFees').textContent = `₹${paidFees.toLocaleString()}`;
+                    document.getElementById('pendingFees').textContent = `₹${pendingFees.toLocaleString()}`;
+                    
+                    // Load fees table
+                    const tableBody = document.getElementById('feesTableBody');
+                    tableBody.innerHTML = '';
+                    
+                    fees.forEach(fee => {
+                        const row = document.createElement('tr');
+                        
+                        // Fee type mapping for display
+                        const feeTypeMap = {
+                            'monthly_rent': 'Monthly Rent',
+                            'security_deposit': 'Security Deposit',
+                            'maintenance': 'Maintenance',
+                            'electricity': 'Electricity',
+                            'other': 'Other'
+                        };
+                        
+                        const displayFeeType = feeTypeMap[fee.feeType] || fee.feeType;
+                        
+                        // Create receipt download button for paid fees
+                        let receiptButton = '';
+                        if (fee.status === 'paid') {
+                            receiptButton = `
+                                <button class="receipt-btn" 
+                                        onclick="window.studentPortalInstance.downloadReceipt('${fee.id}')">
+                                    <i class="fas fa-download"></i> Download Receipt
+                                </button>
+                            `;
+                        } else {
+                            receiptButton = '<span class="text-muted">Payment required</span>';
+                        }
+                        
+                        row.innerHTML = `
+                            <td>${displayFeeType}</td>
+                            <td>${fee.month}/${fee.year}</td>
+                            <td>₹${fee.amount.toLocaleString()}</td>
+                            <td><span class="fees-status fees-${fee.status}">${fee.status}</span></td>
+                            <td>${fee.dueDate}</td>
+                            <td>${receiptButton}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                    
+                } catch (error) {
+                    console.error('Error loading fees:', error);
+                }
+            }
+
+            async loadRoomInfo() {
+                try {
+                    const student = this.currentStudent;
+                    const currentRoomInfo = document.getElementById('currentRoomInfo');
+                    const roommatesList = document.getElementById('roommatesList');
+                    const preferredRoomSelect = document.getElementById('preferredRoom');
+                    
+                    if (!student.assignedRoom) {
+                        currentRoomInfo.innerHTML = `
+                            <div class="room-info-item">
+                                <label>Status</label>
+                                <span>No room assigned yet</span>
+                            </div>
+                        `;
+                        roommatesList.innerHTML = '<p class="text-muted">No roommates - room not assigned</p>';
+                        return;
+                    }
+
+                    // Load current room details
+                    const roomsRef = collection(db, 'rooms');
+                    const roomQuery = query(roomsRef, where('roomNumber', '==', student.assignedRoom));
+                    const roomSnapshot = await getDocs(roomQuery);
+                    
+                    let roomData = null;
+                    if (!roomSnapshot.empty) {
+                        roomData = roomSnapshot.docs[0].data();
+                    }
+
+                    if (roomData) {
+                        currentRoomInfo.innerHTML = `
+                            <div class="room-info-item">
+                                <label>Room Number</label>
+                                <span>${roomData.roomNumber}</span>
+                            </div>
+                            <div class="room-info-item">
+                                <label>Floor</label>
+                                <span>${roomData.floor || 'Not specified'}</span>
+                            </div>
+                            <div class="room-info-item">
+                                <label>Capacity</label>
+                                <span>${roomData.capacity} beds</span>
+                            </div>
+                            <div class="room-info-item">
+                                <label>Current Occupancy</label>
+                                <span>${roomData.occupiedBeds || 0}/${roomData.capacity}</span>
+                            </div>
+                            <div class="room-info-item">
+                                <label>Room Type</label>
+                                <span>${roomData.type || 'Standard'}</span>
+                            </div>
+                            <div class="room-info-item">
+                                <label>Status</label>
+                                <span class="room-status ${roomData.status}">${roomData.status || 'Available'}</span>
+                            </div>
+                        `;
+                    } else {
+                        currentRoomInfo.innerHTML = `
+                            <div class="room-info-item">
+                                <label>Room Number</label>
+                                <span>${student.assignedRoom}</span>
+                            </div>
+                            <div class="room-info-item">
+                                <label>Status</label>
+                                <span>Room details not found</span>
+                            </div>
+                        `;
+                    }
+
+                    // Load roommates
+                    const studentsRef = collection(db, 'students');
+                    const roommatesQuery = query(
+                        studentsRef, 
+                        where('assignedRoom', '==', student.assignedRoom)
+                    );
+                    const roommatesSnapshot = await getDocs(roommatesQuery);
+                    
+                    let roommatesHTML = '';
+                    let roommateCount = 0;
+                    roommatesSnapshot.forEach((doc) => {
+                        const roommate = doc.data();
+                        if (roommate.id !== student.id) {
+                            const initials = `${roommate.firstName?.charAt(0) || ''}${roommate.lastName?.charAt(0) || ''}`;
+                            roommatesHTML += `
+                                <div class="roommate-card">
+                                    <div class="roommate-avatar">${initials}</div>
+                                    <h4>${roommate.firstName} ${roommate.lastName}</h4>
+                                    <p>Roll: ${roommate.rollNumber}</p>
+                                    <p>Course: ${roommate.course || 'Not specified'}</p>
+                                </div>
+                            `;
+                            roommateCount++;
+                        }
+                    });
+                    
+                    if (roommateCount === 0) {
+                        roommatesList.innerHTML = '<p class="text-muted">No roommates currently</p>';
+                    } else {
+                        roommatesList.innerHTML = roommatesHTML;
+                    }
+
+                    // Load available rooms for room change
+                    const availableRoomsQuery = query(roomsRef, where('status', 'in', ['available', 'partial']));
+                    const availableRoomsSnapshot = await getDocs(availableRoomsQuery);
+                    
+                    let roomOptions = '<option value="">Any Available Room</option>';
+                    availableRoomsSnapshot.forEach((doc) => {
+                        const room = doc.data();
+                        if (room.roomNumber !== student.assignedRoom) {
+                            roomOptions += `<option value="${room.roomNumber}">Room ${room.roomNumber} (${room.occupiedBeds || 0}/${room.capacity} occupied)</option>`;
+                        }
+                    });
+                    preferredRoomSelect.innerHTML = roomOptions;
+
+                    // Load room change history
+                    await this.loadRoomChangeHistory();
+
+                } catch (error) {
+                    console.error('Error loading room info:', error);
+                    document.getElementById('currentRoomInfo').innerHTML = '<p class="text-muted">Error loading room information</p>';
+                }
+            }
+
+            async loadRoomChangeHistory() {
+                try {
+                    const roomChangeHistoryDiv = document.getElementById('roomChangeHistory');
+                    const roomChangeRequestsRef = collection(db, 'roomChangeRequests');
+                    
+                    // Simple query without orderBy to avoid composite index requirement
+                    const q = query(
+                        roomChangeRequestsRef,
+                        where('studentId', '==', this.currentStudent.id)
+                    );
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (querySnapshot.empty) {
+                        roomChangeHistoryDiv.innerHTML = '<p class="text-muted">No previous room change requests</p>';
+                        return;
+                    }
+                    
+                    // Get all requests and sort them in JavaScript
+                    const requests = [];
+                    querySnapshot.forEach((doc) => {
+                        const request = doc.data();
+                        requests.push({
+                            id: doc.id,
+                            ...request,
+                            createdAt: request.createdAt?.toDate?.() || new Date(request.createdAt || Date.now())
+                        });
+                    });
+                    
+                    // Sort by creation date, newest first
+                    requests.sort((a, b) => b.createdAt - a.createdAt);
+                    
+                    let historyHTML = '';
+                    requests.forEach((request) => {
+                        const formattedDate = request.createdAt.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        
+                        historyHTML += `
+                            <div class="room-change-history-item">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <strong>Room Change Request</strong>
+                                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                        <span class="leave-status ${request.status}">${request.status}</span>
+                                        ${request.status === 'pending' ? `<button class="btn-delete-request" onclick="studentPortal.deleteRoomChangeRequest('${request.id}')" style="background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'"><i class="fas fa-trash"></i></button>` : ''}
+                                    </div>
+                                </div>
+                                <p><strong>Reason:</strong> ${request.reason}</p>
+                                <p><strong>Preferred Room:</strong> ${request.preferredRoom || 'Any available'}</p>
+                                <p><strong>Date:</strong> ${formattedDate}</p>
+                                ${request.description ? `<p><strong>Details:</strong> ${request.description}</p>` : ''}
+                                ${request.adminResponse ? `<p><strong>Admin Response:</strong> ${request.adminResponse}</p>` : ''}
+                            </div>
+                        `;
+                    });
+                    
+                    roomChangeHistoryDiv.innerHTML = historyHTML;
+                } catch (error) {
+                    console.error('Error loading room change history:', error);
+                    document.getElementById('roomChangeHistory').innerHTML = '<p class="text-muted">Error loading room change history</p>';
+                }
+            }
+
+            async loadLeaveHistory() {
+                try {
+                    const leaveHistoryList = document.getElementById('leaveHistoryList');
+                    const leaveApplicationsRef = collection(db, 'leaveApplications');
+                    
+                    // Simple query without orderBy to avoid composite index requirement
+                    const q = query(
+                        leaveApplicationsRef,
+                        where('studentId', '==', this.currentStudent.id)
+                    );
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (querySnapshot.empty) {
+                        leaveHistoryList.innerHTML = '<p class="text-muted">No leave applications submitted yet</p>';
+                        return;
+                    }
+                    
+                    // Get all leave applications and sort them in JavaScript
+                    const leaves = [];
+                    querySnapshot.forEach((doc) => {
+                        const leave = doc.data();
+                        leaves.push({
+                            id: doc.id,
+                            ...leave,
+                            createdAt: leave.createdAt?.toDate?.() || new Date(leave.createdAt || Date.now()),
+                            startDate: leave.startDate?.toDate?.() || new Date(leave.startDate),
+                            endDate: leave.endDate?.toDate?.() || new Date(leave.endDate)
+                        });
+                    });
+                    
+                    // Sort by creation date, newest first
+                    leaves.sort((a, b) => b.createdAt - a.createdAt);
+                    
+                    let historyHTML = '';
+                    leaves.forEach((leave) => {
+                        const startDate = leave.startDate.toLocaleDateString();
+                        const endDate = leave.endDate.toLocaleDateString();
+                        const appliedDate = leave.createdAt.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        });
+                        
+                        historyHTML += `
+                            <div class="leave-history-item">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <h4>${leave.leaveType}</h4>
+                                    <span class="leave-status ${leave.status}">${leave.status}</span>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                                    <div>
+                                        <strong>Duration:</strong> ${leave.duration}<br>
+                                        <strong>Dates:</strong> ${startDate} to ${endDate}
+                                    </div>
+                                    <div>
+                                        <strong>Applied:</strong> ${appliedDate}<br>
+                                        <strong>Emergency Contact:</strong> ${leave.emergencyContact || 'Not provided'}
+                                    </div>
+                                </div>
+                                <p><strong>Reason:</strong> ${leave.reason}</p>
+                                ${leave.adminResponse ? `<p><strong>Admin Response:</strong> ${leave.adminResponse}</p>` : ''}
+                            </div>
+                        `;
+                    });
+                    
+                    leaveHistoryList.innerHTML = historyHTML;
+                } catch (error) {
+                    console.error('Error loading leave history:', error);
+                    document.getElementById('leaveHistoryList').innerHTML = '<p class="text-muted">Error loading leave history</p>';
+                }
+            }
+            
+            async loadComplaintsHistory() {
+                try {
+                    const complaintsRef = collection(db, 'complaints');
+                    // Simple query without orderBy to avoid composite index requirement
+                    const q = query(
+                        complaintsRef, 
+                        where('studentId', '==', this.currentStudent.id)
+                    );
+                    const querySnapshot = await getDocs(q);
+                    
+                    const complaintsHistory = document.getElementById('complaintsHistory');
+                    complaintsHistory.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        complaintsHistory.innerHTML = '<p class="text-muted">No complaints submitted yet.</p>';
+                        return;
+                    }
+                    
+                    // Get all complaints and sort them in JavaScript
+                    const complaints = [];
+                    querySnapshot.forEach((doc) => {
+                        const complaint = doc.data();
+                        complaints.push({
+                            id: doc.id,
+                            ...complaint,
+                            createdAt: complaint.createdAt?.toDate?.() || new Date(complaint.createdAt || Date.now())
+                        });
+                    });
+                    
+                    // Sort by creation date, newest first
+                    complaints.sort((a, b) => b.createdAt - a.createdAt);
+                    
+                    complaints.forEach((complaint) => {
+                        const complaintDiv = document.createElement('div');
+                        complaintDiv.className = 'enhanced-notice-item';
+                        complaintDiv.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                                <div class="enhanced-notice-title">${complaint.subject}</div>
+                                <span class="enhanced-complaint-status enhanced-status-${complaint.status || 'open'}">${complaint.status || 'pending'}</span>
+                            </div>
+                            <div class="enhanced-notice-content">${complaint.description}</div>
+                            <div class="enhanced-notice-date">
+                                📂 ${complaint.category} | 📅 ${complaint.createdAt.toLocaleDateString()}
+                                ${complaint.roomNumber ? ` | 🏠 Room ${complaint.roomNumber}` : ''}
+                            </div>
+                        `;
+                        complaintsHistory.appendChild(complaintDiv);
+                    });
+                    
+                } catch (error) {
+                    console.error('Error loading complaints:', error);
+                    document.getElementById('complaintsHistory').innerHTML = '<p class="text-muted">Error loading complaints history.</p>';
+                }
+            }
+            
+            async loadNotices() {
+                try {
+                    const noticesRef = collection(db, 'notices');
+                    const q = query(noticesRef, orderBy('createdAt', 'desc'), limit(10));
+                    const querySnapshot = await getDocs(q);
+                    
+                    // Load notices in the tab
+                    const noticesTabContent = document.getElementById('noticesTabContent');
+                    if (noticesTabContent) {
+                        noticesTabContent.innerHTML = '';
+                        
+                        if (querySnapshot.empty) {
+                            noticesTabContent.innerHTML = '<p class="text-muted">No notices available.</p>';
+                        } else {
+                            querySnapshot.forEach((doc) => {
+                                const notice = doc.data();
+                                const noticeDiv = document.createElement('div');
+                                noticeDiv.className = 'enhanced-notice-item';
+                                
+                                // Priority badge
+                                const priorityColors = {
+                                    'urgent': '🔴',
+                                    'high': '🟠', 
+                                    'medium': '🟡',
+                                    'low': '🟢'
+                                };
+                                const priorityIcon = priorityColors[notice.priority] || '📢';
+                                
+                                noticeDiv.innerHTML = `
+                                    <div class="enhanced-notice-title">
+                                        ${priorityIcon} ${notice.title}
+                                    </div>
+                                    <div class="enhanced-notice-content">${notice.content}</div>
+                                    <div class="enhanced-notice-date">
+                                        📅 ${notice.createdAt?.toDate?.()?.toLocaleDateString() || 'Unknown'} 
+                                        ${notice.priority ? `| Priority: ${notice.priority.toUpperCase()}` : ''}
+                                    </div>
+                                `;
+                                noticesTabContent.appendChild(noticeDiv);
+                            });
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error('Error loading notices:', error);
+                    const noticesTabContent = document.getElementById('noticesTabContent');
+                    if (noticesTabContent) {
+                        noticesTabContent.innerHTML = '<p class="text-muted">Error loading notices.</p>';
+                    }
+                }
+            }
+            
+            async submitComplaint(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(e.target);
+                const complaintData = {
+                    studentId: this.currentStudent.id,
+                    studentName: `${this.currentStudent.firstName} ${this.currentStudent.lastName}`,
+                    rollNumber: this.currentStudent.rollNumber,
+                    roomNumber: this.currentStudent.assignedRoom || 'Not Assigned',
+                    category: formData.get('category'),
+                    subject: formData.get('subject'),
+                    description: formData.get('description'),
+                    status: 'open',
+                    priority: 'medium',
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+                
+                try {
+                    const docRef = await addDoc(collection(db, 'complaints'), complaintData);
+                    this.showNotification('Complaint submitted successfully! It will be reviewed by the admin.', 'success');
+                    e.target.reset();
+                    await this.loadComplaintsHistory(); // Reload complaints
+                } catch (error) {
+                    console.error('Error submitting complaint:', error);
+                    this.showNotification('Failed to submit complaint. Please try again.', 'error');
+                }
+            }
+            
+            async loadDocuments() {
+                const documentsContent = document.getElementById('documentsContent');
+                const student = this.currentStudent;
+                
+                // Display uploaded documents from student profile
+                let documentsHTML = '<div class="profile-info">';
+                
+                if (student.documentsUrl) {
+                    documentsHTML += `
+                        <div class="info-item">
+                            <label>Uploaded Documents</label>
+                            <a href="${student.documentsUrl}" target="_blank" class="btn btn-secondary" style="display: inline-block; margin-top: 0.5rem;">
+                                <i class="fas fa-file-pdf"></i> View Documents
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    documentsHTML += `
+                        <div class="info-item">
+                            <label>Documents Status</label>
+                            <span style="color: #666;">No documents uploaded yet</span>
+                        </div>
+                    `;
+                }
+                
+                documentsHTML += `
+                    <div class="info-item">
+                        <label>Document Requirements</label>
+                        <span>
+                            • Aadhar Card Copy<br>
+                            • Academic Marksheet<br>
+                            • Medical Certificate<br>
+                            • Guardian ID Proof
+                        </span>
+                    </div>
+                `;
+                
+                documentsHTML += '</div>';
+                documentsContent.innerHTML = documentsHTML;
+            }
+            
+            async loadMaintenanceHistory() {
+                try {
+                    const maintenanceRef = collection(db, 'maintenance');
+                    // Simple query without orderBy to avoid composite index requirement
+                    const q = query(
+                        maintenanceRef, 
+                        where('studentId', '==', this.currentStudent.id)
+                    );
+                    const querySnapshot = await getDocs(q);
+                    
+                    const maintenanceHistory = document.getElementById('maintenanceHistory');
+                    maintenanceHistory.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        maintenanceHistory.innerHTML = '<p class="text-muted">No maintenance requests submitted yet.</p>';
+                        return;
+                    }
+                    
+                    // Get all maintenance requests and sort them in JavaScript
+                    const requests = [];
+                    querySnapshot.forEach((doc) => {
+                        const request = doc.data();
+                        requests.push({
+                            id: doc.id,
+                            ...request,
+                            createdAt: request.createdAt?.toDate?.() || new Date(request.createdAt || Date.now())
+                        });
+                    });
+                    
+                    // Sort by creation date, newest first
+                    requests.sort((a, b) => b.createdAt - a.createdAt);
+                    
+                    requests.forEach((request) => {
+                        const requestDiv = document.createElement('div');
+                        requestDiv.className = 'complaint-item';
+                        requestDiv.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <strong>${request.subject}</strong>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <span class="complaint-status status-${request.priority?.toLowerCase()}" style="background: ${this.getPriorityColor(request.priority)};">
+                                        ${request.priority} Priority
+                                    </span>
+                                    <span class="complaint-status status-${request.status}">${request.status}</span>
+                                </div>
+                            </div>
+                            <div class="notice-content">${request.description}</div>
+                            <div class="notice-date">
+                                Type: ${request.type} | 
+                                Submitted: ${request.createdAt.toLocaleDateString()}
+                            </div>
+                        `;
+                        maintenanceHistory.appendChild(requestDiv);
+                    });
+                    
+                } catch (error) {
+                    console.error('Error loading maintenance history:', error);
+                    document.getElementById('maintenanceHistory').innerHTML = '<p class="text-muted">Error loading maintenance history.</p>';
+                }
+            }
+            
+            async submitMaintenanceRequest(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(e.target);
+                const maintenanceData = {
+                    studentId: this.currentStudent.id,
+                    studentName: `${this.currentStudent.firstName} ${this.currentStudent.lastName}`,
+                    rollNumber: this.currentStudent.rollNumber,
+                    roomNumber: this.currentStudent.assignedRoom || 'Not Assigned',
+                    type: formData.get('type'),
+                    priority: formData.get('priority'),
+                    subject: formData.get('subject'),
+                    description: formData.get('description'),
+                    status: 'pending',
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+                
+                try {
+                    await addDoc(collection(db, 'maintenance'), maintenanceData);
+                    this.showNotification('Maintenance request submitted successfully!', 'success');
+                    e.target.reset();
+                    this.loadMaintenanceHistory(); // Reload maintenance history
+                } catch (error) {
+                    console.error('Error submitting maintenance request:', error);
+                    this.showNotification('Failed to submit maintenance request. Please try again.', 'error');
+                }
+            }
+
+            async submitRoomChangeRequest(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(e.target);
+                const roomChangeData = {
+                    studentId: this.currentStudent.id,
+                    studentName: `${this.currentStudent.firstName} ${this.currentStudent.lastName}`,
+                    rollNumber: this.currentStudent.rollNumber,
+                    currentRoom: this.currentStudent.assignedRoom || 'Not Assigned',
+                    reason: formData.get('reason'),
+                    preferredRoom: formData.get('preferredRoom') || '',
+                    description: formData.get('description') || '',
+                    status: 'pending',
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+                
+                try {
+                    await addDoc(collection(db, 'roomChangeRequests'), roomChangeData);
+                    this.showNotification('Room change request submitted successfully! Admin will review your request.', 'success');
+                    e.target.reset();
+                    await this.loadRoomChangeHistory();
+                } catch (error) {
+                    console.error('Error submitting room change request:', error);
+                    this.showNotification('Failed to submit room change request. Please try again.', 'error');
+                }
+            }
+
+            async deleteRoomChangeRequest(requestId) {
+                if (!confirm('Are you sure you want to delete this room change request?')) {
+                    return;
+                }
+                
+                try {
+                    const requestRef = doc(db, 'roomChangeRequests', requestId);
+                    await deleteDoc(requestRef);
+                    this.showNotification('Room change request deleted successfully!', 'success');
+                    await this.loadRoomChangeHistory();
+                } catch (error) {
+                    console.error('Error deleting room change request:', error);
+                    this.showNotification('Failed to delete request. Please try again.', 'error');
+                }
+            }
+
+            async submitLeaveApplication(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(e.target);
+                
+                // Validate dates
+                const startDate = new Date(formData.get('startDate'));
+                const endDate = new Date(formData.get('endDate'));
+                const today = new Date();
+                
+                if (startDate < today) {
+                    this.showNotification('Start date cannot be in the past', 'error');
+                    return;
+                }
+                
+                if (endDate < startDate) {
+                    this.showNotification('End date cannot be before start date', 'error');
+                    return;
+                }
+                
+                const leaveData = {
+                    studentId: this.currentStudent.id,
+                    studentName: `${this.currentStudent.firstName} ${this.currentStudent.lastName}`,
+                    rollNumber: this.currentStudent.rollNumber,
+                    roomNumber: this.currentStudent.assignedRoom || 'Not Assigned',
+                    leaveType: formData.get('leaveType'),
+                    duration: formData.get('duration'),
+                    startDate: startDate,
+                    endDate: endDate,
+                    reason: formData.get('reason'),
+                    emergencyContact: formData.get('emergencyContact') || '',
+                    parentApproval: formData.get('parentApproval') === 'on',
+                    status: 'pending',
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+                
+                try {
+                    await addDoc(collection(db, 'leaveApplications'), leaveData);
+                    this.showNotification('Leave application submitted successfully! You will be notified about the decision.', 'success');
+                    e.target.reset();
+                    await this.loadLeaveHistory();
+                } catch (error) {
+                    console.error('Error submitting leave application:', error);
+                    this.showNotification('Failed to submit leave application. Please try again.', 'error');
+                }
+            }
+            
+            getPriorityColor(priority) {
+                switch(priority?.toLowerCase()) {
+                    case 'urgent': return '#dc3545';
+                    case 'high': return '#fd7e14';
+                    case 'medium': return '#ffc107';
+                    case 'low': return '#28a745';
+                    default: return '#6c757d';
+                }
+            }
+            
+            async testFirebaseConnection() {
+                try {
+                    console.log('Testing Firebase connection...');
+                    const studentsRef = collection(db, 'students');
+                    const testQuery = query(studentsRef, limit(1));
+                    const snapshot = await getDocs(testQuery);
+                    console.log('Firebase connection successful. Students collection accessible.');
+                    console.log('Total students found:', snapshot.size);
+                    
+                    if (snapshot.size > 0) {
+                        snapshot.forEach((doc) => {
+                            const student = doc.data();
+                            console.log('Sample student:', {
+                                firstName: student.firstName,
+                                lastName: student.lastName,
+                                rollNumber: student.rollNumber
+                            });
+                        });
+                    } else {
+                        console.log('No students found in database. Please add students through admin panel first.');
+                    }
+                } catch (error) {
+                    console.error('Firebase connection failed:', error);
+                    this.showNotification('Database connection failed. Please check your connection.', 'error');
+                }
+            }
+            
+            showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? '#d4edda' : type === 'error' ? '#f8d7da' : '#cce7ff'};
+                    color: ${type === 'success' ? '#155724' : type === 'error' ? '#721c24' : '#004085'};
+                    padding: 1rem 1.5rem;
+                    border-radius: 8px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                    z-index: 1000;
+                    max-width: 400px;
+                `;
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            }
+            
+            async downloadReceipt(feeId) {
+                try {
+                    this.showNotification('Generating receipt...', 'info');
+                    
+                    // Get fee details
+                    const feesRef = collection(db, 'fees');
+                    const feeDoc = await getDoc(doc(feesRef, feeId));
+                    
+                    if (!feeDoc.exists()) {
+                        this.showNotification('Fee record not found', 'error');
+                        return;
+                    }
+                    
+                    const feeData = { id: feeDoc.id, ...feeDoc.data() };
+                    
+                    // Ensure fee is paid before generating receipt
+                    if (feeData.status !== 'paid') {
+                        this.showNotification('Receipt can only be generated for paid fees', 'error');
+                        return;
+                    }
+                    
+                    // Get room data using room lookup logic like admin system
+                    let roomData = {};
+                    if (this.currentStudent.assignedRoom) {
+                        // Check if assignedRoom is a document ID or room number
+                        const isDocumentId = this.currentStudent.assignedRoom.length > 15 && /^[a-zA-Z0-9]+$/.test(this.currentStudent.assignedRoom);
+                        
+                        if (isDocumentId) {
+                            // Fetch room by document ID
+                            const roomDoc = await getDoc(doc(db, 'rooms', this.currentStudent.assignedRoom));
+                            if (roomDoc.exists()) {
+                                roomData = roomDoc.data();
+                            }
+                        } else {
+                            // Find room by room number
+                            const roomsRef = collection(db, 'rooms');
+                            const roomQuery = query(roomsRef, where('roomNumber', '==', this.currentStudent.assignedRoom));
+                            const roomSnapshot = await getDocs(roomQuery);
+                            
+                            if (!roomSnapshot.empty) {
+                                roomData = roomSnapshot.docs[0].data();
+                            }
+                        }
+                    }
+                    
+                    // Generate HTML receipt like admin system
+                    const receiptHtml = this.createReceiptHTML(feeData, this.currentStudent, roomData);
+                    
+                    // Show in new window and print (same as admin system)
+                    const receiptWindow = window.open('', '_blank');
+                    receiptWindow.document.write(receiptHtml);
+                    receiptWindow.document.close();
+                    receiptWindow.print();
+                    
+                    this.showNotification('Receipt generated successfully!', 'success');
+                    
+                } catch (error) {
+                    console.error('Error generating receipt:', error);
+                    this.showNotification('Failed to generate receipt. Please try again.', 'error');
+                }
+            }
+            
+            createReceiptHTML(fee, student, room) {
+                const currentDate = new Date();
+                const receiptNumber = `RCP-${fee.id.slice(-8).toUpperCase()}`;
+                const timestamp = currentDate.getTime();
+                const verificationCode = this.generateVerificationCode(fee.id, student.rollNumber, fee.amount, timestamp);
+                const receiptData = {
+                    studentName: `${student.firstName} ${student.lastName}`,
+                    rollNumber: student.rollNumber,
+                    amount: fee.amount,
+                    feeType: fee.feeType,
+                    timestamp: timestamp
+                };
+                const securityHash = this.generateSecurityHash(receiptData);
+                const digitalSignature = this.generateDigitalSignature(receiptNumber, fee.amount, currentDate);
+                
+                const feeTypeMap = {
+                    'monthly_rent': 'Monthly Rent',
+                    'security_deposit': 'Security Deposit',
+                    'maintenance': 'Maintenance',
+                    'electricity': 'Electricity',
+                    'other': 'Other'
+                };
+
+                const formatDate = (date) => {
+                    return date.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                };
+
+                const formatCurrency = (amount) => {
+                    return `₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                };
+
+                const getMonthName = (monthNum) => {
+                    const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                                  'July', 'August', 'September', 'October', 'November', 'December'];
+                    return months[monthNum - 1] || 'Unknown';
+                };
+
+                const period = fee.feeType === 'security_deposit' ? 
+                    'One-time Security Deposit' : 
+                    `${getMonthName(parseInt(fee.month))} ${fee.year}`;
+
+                return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Payment Receipt - ${receiptNumber}</title>
+                    <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+                        
+                        * { 
+                            box-sizing: border-box; 
+                            -webkit-user-select: none;
+                            -moz-user-select: none;
+                            -ms-user-select: none;
+                            user-select: none;
+                        }
+                        
+                        body { 
+                            font-family: 'Inter', Arial, sans-serif; 
+                            margin: 0; 
+                            padding: 30px;
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            min-height: 100vh;
+                            position: relative;
+                            overflow-x: hidden;
+                        }
+                        
+                        body::before {
+                            content: '';
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            background-image: 
+                                repeating-linear-gradient(
+                                    45deg,
+                                    transparent,
+                                    transparent 10px,
+                                    rgba(255,255,255,0.05) 10px,
+                                    rgba(255,255,255,0.05) 20px
+                                );
+                            pointer-events: none;
+                            z-index: -1;
+                        }
+                        
+                        .receipt-container {
+                            max-width: 800px;
+                            margin: 0 auto;
+                            background: #fff;
+                            border-radius: 20px;
+                            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+                            overflow: hidden;
+                            position: relative;
+                            border: 3px solid #fff;
+                        }
+                        
+                        .security-watermark {
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%) rotate(-45deg);
+                            font-size: 120px;
+                            color: rgba(102, 126, 234, 0.08);
+                            font-weight: 900;
+                            z-index: 1;
+                            pointer-events: none;
+                            text-transform: uppercase;
+                            letter-spacing: 10px;
+                        }
+                        
+                        .receipt-content {
+                            position: relative;
+                            z-index: 2;
+                            padding: 40px;
+                        }
+                        
+                        .receipt-header {
+                            text-align: center;
+                            margin-bottom: 40px;
+                            border-bottom: 3px solid #667eea;
+                            padding-bottom: 30px;
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            margin: -40px -40px 40px -40px;
+                            padding: 40px 40px 30px 40px;
+                            color: white;
+                        }
+                        
+                        .hostel-logo {
+                            width: 80px;
+                            height: 80px;
+                            background: rgba(255,255,255,0.2);
+                            border-radius: 50%;
+                            margin: 0 auto 20px auto;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 32px;
+                            border: 3px solid rgba(255,255,255,0.3);
+                        }
+                        
+                        .receipt-title {
+                            font-size: 32px;
+                            font-weight: 700;
+                            margin-bottom: 8px;
+                            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                        }
+                        
+                        .receipt-subtitle {
+                            font-size: 18px;
+                            font-weight: 500;
+                            opacity: 0.9;
+                        }
+                        
+                        .security-info {
+                            display: flex;
+                            justify-content: space-between;
+                            margin: 30px 0;
+                            padding: 20px;
+                            background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%);
+                            border-radius: 15px;
+                            border: 2px solid #667eea;
+                        }
+                        
+                        .security-item {
+                            text-align: center;
+                            flex: 1;
+                        }
+                        
+                        .security-label {
+                            font-size: 12px;
+                            color: #666;
+                            font-weight: 600;
+                            margin-bottom: 5px;
+                            text-transform: uppercase;
+                        }
+                        
+                        .security-value {
+                            font-size: 14px;
+                            font-weight: 700;
+                            color: #333;
+                            font-family: 'Courier New', monospace;
+                        }
+                        
+                        .receipt-info {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 40px;
+                            margin-bottom: 40px;
+                        }
+                        
+                        .info-section {
+                            background: #f8f9fa;
+                            padding: 25px;
+                            border-radius: 15px;
+                            border-left: 5px solid #667eea;
+                        }
+                        
+                        .info-label {
+                            font-weight: 600;
+                            color: #495057;
+                            font-size: 12px;
+                            text-transform: uppercase;
+                            margin-bottom: 8px;
+                            letter-spacing: 1px;
+                        }
+                        
+                        .info-value {
+                            font-size: 16px;
+                            font-weight: 500;
+                            color: #212529;
+                            margin-bottom: 15px;
+                        }
+                        
+                        .payment-details {
+                            background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+                            padding: 30px;
+                            border-radius: 15px;
+                            margin-bottom: 30px;
+                            border: 2px solid #e9ecef;
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                        }
+                        
+                        .payment-details h3 {
+                            margin: 0 0 25px 0;
+                            color: #333;
+                            font-size: 20px;
+                            font-weight: 700;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                        }
+                        
+                        .payment-details h3::before {
+                            content: '💳';
+                            font-size: 24px;
+                        }
+                        
+                        .payment-row {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            margin-bottom: 15px;
+                            padding: 12px 0;
+                            border-bottom: 1px solid #e9ecef;
+                        }
+                        
+                        .payment-row:last-child {
+                            border-bottom: none;
+                        }
+                        
+                        .payment-label {
+                            font-weight: 500;
+                            color: #495057;
+                        }
+                        
+                        .payment-value {
+                            font-weight: 600;
+                            color: #212529;
+                        }
+                        
+                        .total-amount {
+                            font-size: 20px;
+                            font-weight: 700;
+                            color: #28a745;
+                            border-top: 3px solid #667eea;
+                            padding-top: 20px;
+                            margin-top: 20px;
+                            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+                            padding: 20px;
+                            border-radius: 10px;
+                        }
+                        
+                        .verification-section {
+                            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+                            padding: 25px;
+                            border-radius: 15px;
+                            margin-bottom: 30px;
+                            border: 2px solid #ffc107;
+                            text-align: center;
+                        }
+                        
+                        .verification-title {
+                            font-weight: 700;
+                            color: #856404;
+                            margin-bottom: 15px;
+                            font-size: 16px;
+                        }
+                        
+                        .verification-code {
+                            font-family: 'Courier New', monospace;
+                            font-size: 18px;
+                            font-weight: 700;
+                            color: #856404;
+                            background: rgba(255,255,255,0.7);
+                            padding: 10px 20px;
+                            border-radius: 8px;
+                            display: inline-block;
+                            letter-spacing: 2px;
+                        }
+                        
+                        .footer {
+                            text-align: center;
+                            margin-top: 40px;
+                            padding-top: 30px;
+                            border-top: 2px solid #e9ecef;
+                            color: #6c757d;
+                            font-size: 12px;
+                            line-height: 1.6;
+                        }
+                        
+                        .footer-warning {
+                            background: #f8d7da;
+                            color: #721c24;
+                            padding: 15px;
+                            border-radius: 8px;
+                            margin-top: 20px;
+                            font-weight: 600;
+                            border: 1px solid #f5c6cb;
+                        }
+                        
+                        .qr-placeholder {
+                            width: 80px;
+                            height: 80px;
+                            background: #333;
+                            margin: 15px auto;
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-size: 10px;
+                            text-align: center;
+                        }
+                        
+                        @media print {
+                            body { 
+                                margin: 0; 
+                                padding: 20px;
+                                background: white !important;
+                            }
+                            .receipt-container {
+                                box-shadow: none;
+                                border: 2px solid #333;
+                            }
+                            .security-watermark {
+                                display: block !important;
+                                opacity: 0.1 !important;
+                            }
+                        }
+                        
+                        @media (max-width: 768px) {
+                            .receipt-info {
+                                grid-template-columns: 1fr;
+                                gap: 20px;
+                            }
+                            
+                            .security-info {
+                                flex-direction: column;
+                                gap: 15px;
+                            }
+                            
+                            .receipt-content {
+                                padding: 20px;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="receipt-container">
+                        <div class="security-watermark">ORIGINAL</div>
+                        
+                        <div class="receipt-content">
+                            <div class="receipt-header">
+                                <div class="hostel-logo">🏠</div>
+                                <div class="receipt-title">Navadaya Girls Hostel</div>
+                                <div class="receipt-subtitle">Official Payment Receipt</div>
+                            </div>
+
+                            <div class="security-info">
+                                <div class="security-item">
+                                    <div class="security-label">Receipt ID</div>
+                                    <div class="security-value">${receiptNumber}</div>
+                                </div>
+                                <div class="security-item">
+                                    <div class="security-label">Verification</div>
+                                    <div class="security-value">${verificationCode}</div>
+                                </div>
+                                <div class="security-item">
+                                    <div class="security-label">Security Hash</div>
+                                    <div class="security-value">${securityHash}</div>
+                                </div>
+                                <div class="security-item">
+                                    <div class="security-label">Digital Sign</div>
+                                    <div class="security-value">${digitalSignature}</div>
+                                </div>
+                            </div>
+
+                            <div class="receipt-info">
+                                <div class="info-section">
+                                    <div class="info-label">Receipt Information</div>
+                                    <div class="info-value">📄 ${receiptNumber}</div>
+                                    
+                                    <div class="info-label">Generated Date</div>
+                                    <div class="info-value">📅 ${formatDate(currentDate)}</div>
+                                    
+                                    <div class="info-label">Time</div>
+                                    <div class="info-value">⏰ ${currentDate.toLocaleTimeString()}</div>
+                                </div>
+                                
+                                <div class="info-section">
+                                    <div class="info-label">Student Details</div>
+                                    <div class="info-value">👤 ${student.firstName} ${student.lastName}</div>
+                                    
+                                    <div class="info-label">Roll Number</div>
+                                    <div class="info-value">🎓 ${student.rollNumber}</div>
+                                    
+                                    <div class="info-label">Room Assignment</div>
+                                    <div class="info-value">🏠 ${room && room.roomNumber ? `Room ${room.roomNumber}` : 'Not Assigned'}</div>
+                                </div>
+                            </div>
+
+                            <div class="payment-details">
+                                <h3>Payment Information</h3>
+                                
+                                <div class="payment-row">
+                                    <span class="payment-label">Fee Type:</span>
+                                    <span class="payment-value">${feeTypeMap[fee.feeType] || 'Monthly Rent'}</span>
+                                </div>
+                                
+                                <div class="payment-row">
+                                    <span class="payment-label">Billing Period:</span>
+                                    <span class="payment-value">${period}</span>
+                                </div>
+                                
+                                <div class="payment-row">
+                                    <span class="payment-label">Payment Date:</span>
+                                    <span class="payment-value">${fee.paymentDate ? formatDate(new Date(fee.paymentDate)) : formatDate(currentDate)}</span>
+                                </div>
+                                
+                                <div class="payment-row">
+                                    <span class="payment-label">Payment Method:</span>
+                                    <span class="payment-value">${fee.paymentMethod || 'Cash'}</span>
+                                </div>
+                                
+                                ${fee.notes ? `
+                                <div class="payment-row">
+                                    <span class="payment-label">Additional Notes:</span>
+                                    <span class="payment-value">${fee.notes}</span>
+                                </div>
+                                ` : ''}
+                                
+                                <div class="payment-row total-amount">
+                                    <span class="payment-label">💰 Total Amount Paid:</span>
+                                    <span class="payment-value">${formatCurrency(fee.amount)}</span>
+                                </div>
+                            </div>
+
+                            <div class="verification-section">
+                                <div class="verification-title">🔐 Receipt Verification Code</div>
+                                <div class="verification-code">${verificationCode}</div>
+                                <div style="margin-top: 10px; font-size: 11px; color: #856404;">
+                                    Use this code to verify authenticity at hostel office
+                                </div>
+                                <div class="qr-placeholder">QR Code<br>Verification</div>
+                            </div>
+
+                            <div class="footer">
+                                <p><strong>🏛️ Navadaya Girls Hostel Management System</strong></p>
+                                <p>This is an official computer-generated receipt with digital security features.</p>
+                                <p>Generated on ${formatDate(currentDate)} at ${currentDate.toLocaleTimeString()}</p>
+                                <p>For queries, contact the hostel administration office.</p>
+                                
+                                <div class="footer-warning">
+                                    ⚠️ WARNING: This receipt contains security features to prevent forgery. 
+                                    Any attempt to modify, copy, or duplicate this receipt is strictly prohibited and may result in disciplinary action.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                `;
+            }
+            
+            generateVerificationCode(feeId, rollNumber, amount, timestamp) {
+                // Create a unique verification code based on multiple parameters
+                const baseString = `${feeId}${rollNumber}${amount}${timestamp}NAVADAYA${new Date().getFullYear()}`;
+                let hash = 0;
+                for (let i = 0; i < baseString.length; i++) {
+                    const char = baseString.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash; // Convert to 32-bit integer
+                }
+                // Create more complex verification code with checksum
+                const primaryCode = Math.abs(hash).toString(36).toUpperCase().slice(0, 6);
+                const checksum = this.calculateChecksum(baseString);
+                return `${primaryCode}-${checksum}`;
+            }
+            
+            calculateChecksum(data) {
+                let sum = 0;
+                for (let i = 0; i < data.length; i++) {
+                    sum += data.charCodeAt(i) * (i + 1);
+                }
+                return (sum % 999).toString().padStart(3, '0');
+            }
+            
+            generateSecurityHash(receiptData) {
+                // Generate a complex security hash based on receipt data
+                const securityString = `${receiptData.studentName}${receiptData.rollNumber}${receiptData.amount}${receiptData.feeType}${receiptData.timestamp}NAVADAYA_SECURITY_2025`;
+                let hash = 0;
+                for (let i = 0; i < securityString.length; i++) {
+                    const char = securityString.charCodeAt(i);
+                    hash = ((hash << 7) - hash) + char;
+                    hash = hash & hash;
+                }
+                return Math.abs(hash).toString(16).toUpperCase().slice(0, 12);
+            }
+            
+            generateDigitalSignature(receiptNumber, amount, date) {
+                // Create a digital signature for security
+                const signatureBase = `${receiptNumber}${amount}${date.getTime()}`;
+                let signature = 0;
+                for (let i = 0; i < signatureBase.length; i++) {
+                    signature = ((signature << 3) - signature) + signatureBase.charCodeAt(i);
+                    signature = signature & signature;
+                }
+                return Math.abs(signature).toString(16).toUpperCase().slice(0, 6);
+            }
+        }
+        
+        // Tab functionality
+        window.showTab = function(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        };
+        
+        // Logout functionality
+        window.logout = function() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear session from localStorage
+                clearSession();
+                
+                // Reset current student
+                if (window.studentPortalInstance) {
+                    window.studentPortalInstance.currentStudent = null;
+                }
+                
+                // Show login page and hide dashboard
+                document.getElementById('studentDashboard').style.display = 'none';
+                document.getElementById('studentLogin').style.display = 'flex';
+                document.getElementById('studentLoginForm').reset();
+            }
+        };
+        
+        // Session management
+        window.saveSession = function(studentData) {
+            localStorage.setItem('studentSession', JSON.stringify({
+                student: studentData,
+                loginTime: Date.now(),
+                isLoggedIn: true
+            }));
+        };
+        
+        window.clearSession = function() {
+            localStorage.removeItem('studentSession');
+        };
+        
+        window.getSession = function() {
+            const session = localStorage.getItem('studentSession');
+            if (session) {
+                const sessionData = JSON.parse(session);
+                // Check if session is valid (not older than 24 hours)
+                const isValidSession = (Date.now() - sessionData.loginTime) < (24 * 60 * 60 * 1000);
+                if (isValidSession && sessionData.isLoggedIn) {
+                    return sessionData;
+                }
+                // Clear invalid session
+                localStorage.removeItem('studentSession');
+            }
+            return null;
+        };
+        
+        // Check for existing session on page load
+        window.checkExistingSession = function() {
+            const session = getSession();
+            if (session && session.student) {
+                // Auto-login with existing session
+                window.studentPortalInstance.currentStudent = session.student;
+                window.studentPortalInstance.showDashboard();
+                // Load all student data in background
+                window.studentPortalInstance.loadStudentData();
+                return true;
+            }
+            return false;
+        };
+        
+        // Initialize the portal
+        window.studentPortalInstance = new StudentPortal();
+        
+        // Check for existing session when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!checkExistingSession()) {
+                // Show login page if no valid session
+                document.getElementById('studentLogin').style.display = 'flex';
+                document.getElementById('studentDashboard').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

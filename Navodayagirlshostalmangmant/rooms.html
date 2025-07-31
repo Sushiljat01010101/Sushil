@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms - Navadaya Girls Hostel</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-home"></i>
+                <span>Navadaya Admin</span>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="dashboard.html">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="rooms.html">
+                        <i class="fas fa-bed"></i>
+                        <span>Rooms</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="students.html">
+                        <i class="fas fa-users"></i>
+                        <span>Students</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="fees.html">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Fees</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="notices.html">
+                        <i class="fas fa-bullhorn"></i>
+                        <span>Notices</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="complaints.html">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Complaints</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="roomchangemanagement.html">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Room Changes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="leavemanagement.html">
+                        <i class="fas fa-calendar-times"></i>
+                        <span>Leave Applications</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="roommaintenancerequests.html">
+                        <i class="fas fa-tools"></i>
+                        <span>Maintenance Requests</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="receipt-verification.html">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Receipt Verification</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1>Room Management</h1>
+                <button id="addRoomBtn" class="btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Add Room
+                </button>
+            </header>
+
+            <div class="content-body">
+                <!-- Filters -->
+                <div class="filters-section">
+                    <div class="filter-group">
+                        <select id="floorFilter">
+                            <option value="">All Floors</option>
+                            <option value="1">Floor 1</option>
+                            <option value="2">Floor 2</option>
+                            <option value="3">Floor 3</option>
+                            <option value="4">Floor 4</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="available">Available</option>
+                            <option value="partial">Partial</option>
+                            <option value="full">Full</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                    
+                    <div class="search-group">
+                        <input type="text" id="searchRoom" placeholder="Search room...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+
+                <!-- Rooms Grid -->
+                <div id="roomsGrid" class="rooms-grid">
+                    <!-- Room cards will be loaded dynamically -->
+                </div>
+                
+                <div id="emptyState" class="empty-state hidden">
+                    <i class="fas fa-bed"></i>
+                    <h3>No rooms found</h3>
+                    <p>Add your first room to get started</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Room Modal -->
+    <div id="roomModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add Room</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            
+            <form id="roomForm">
+                <div class="form-group">
+                    <label for="roomNumber">Room Number</label>
+                    <input type="text" id="roomNumber" name="roomNumber" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="floor">Floor</label>
+                    <select id="floor" name="floor" required>
+                        <option value="1">Floor 1</option>
+                        <option value="2">Floor 2</option>
+                        <option value="3">Floor 3</option>
+                        <option value="4">Floor 4</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="capacity">Capacity</label>
+                    <input type="number" id="capacity" name="capacity" min="1" max="4" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="roomType">Room Type</label>
+                    <select id="roomType" name="roomType" required>
+                        <option value="single">Single</option>
+                        <option value="double">Double</option>
+                        <option value="triple">Triple</option>
+                        <option value="quad">Quad</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="monthlyRent">Monthly Rent (₹)</label>
+                    <input type="number" id="monthlyRent" name="monthlyRent" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amenities">Amenities</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" value="ac"> AC</label>
+                        <label><input type="checkbox" value="wifi"> WiFi</label>
+                        <label><input type="checkbox" value="attached_bathroom"> Attached Bathroom</label>
+                        <label><input type="checkbox" value="balcony"> Balcony</label>
+                        <label><input type="checkbox" value="study_table"> Study Table</label>
+                        <label><input type="checkbox" value="wardrobe"> Wardrobe</label>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Room</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDA6duS8SJ5Wr26qNxzBoge01Leestj-9o",
+            authDomain: "animal-planet-73497.firebaseapp.com",
+            databaseURL: "https://animal-planet-73497-default-rtdb.firebaseio.com",
+            projectId: "animal-planet-73497",
+            storageBucket: "animal-planet-73497.appspot.com",
+            messagingSenderId: "15025745338",
+            appId: "1:15025745338:web:f2d2e2644d822afea00183",
+            measurementId: "G-KP9582LMC3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.firebase = { app, auth, db };
+    </script>
+
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/rooms.js"></script>
+</body>
+</html>
