@@ -3,242 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mochi AI Controller V2.0</title>
-    <!-- MediaPipe & Fonts -->
+    <title>Mochi Robot Remote</title>
+    <!-- MediaPipe & Icons -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.js" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #00f3ff;
-            --accent: #ff0055;
-            --bg: #050510;
-            --glass: rgba(0, 243, 255, 0.1);
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --primary: #4f46e5; /* Indigo */
+            --success: #10b981; /* Green */
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--primary);
-            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
             margin: 0;
             height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             overflow: hidden;
         }
 
-        /* --- HUD CONTAINER --- */
-        #hud-container {
-            position: relative;
+        /* --- TOP BAR --- */
+        header {
             width: 100%;
-            max-width: 500px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            background: radial-gradient(circle at center, #1a1a2e 0%, #000 100%);
-        }
-
-        /* Header */
-        .header {
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(180deg, rgba(0,243,255,0.1) 0%, transparent 100%);
-            border-bottom: 1px solid var(--primary);
+            padding: 15px 0;
+            background: var(--card-bg);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
             z-index: 10;
         }
+        h1 { margin: 0; font-size: 1.2rem; color: var(--text-main); }
+        .status-dot { display: inline-block; width: 10px; height: 10px; background: #ccc; border-radius: 50%; margin-right: 5px; }
+        .status-text { font-size: 0.85rem; color: var(--text-sub); }
 
-        .status-badge {
-            font-size: 0.9rem;
-            padding: 5px 10px;
-            border: 1px solid var(--primary);
-            border-radius: 4px;
-            background: rgba(0,0,0,0.5);
-            text-shadow: 0 0 5px var(--primary);
-        }
-
-        /* Video Area */
-        .viewport {
+        /* --- CAMERA CONTAINER --- */
+        .camera-wrapper {
             position: relative;
-            flex-grow: 1;
+            width: 90%;
+            max-width: 400px;
+            aspect-ratio: 3/4;
+            margin-top: 20px;
+            background: #000;
+            border-radius: 20px;
             overflow: hidden;
-            margin: 10px;
-            border: 2px solid var(--primary);
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
 
         video, canvas {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             object-fit: cover;
-            transform: scaleX(-1); /* Mirror */
+            transform: scaleX(-1); /* Mirror Mode */
         }
 
-        /* Scanner Effect */
-        .scanner-line {
+        /* Overlay Messages */
+        .feedback-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: var(--primary);
-            box-shadow: 0 0 10px var(--primary);
-            opacity: 0.5;
-            animation: scan 3s infinite linear;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: var(--primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
             pointer-events: none;
-            z-index: 5;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            white-space: nowrap;
         }
 
-        @keyframes scan {
-            0% { top: 0%; opacity: 0; }
-            50% { opacity: 1; }
-            100% { top: 100%; opacity: 0; }
-        }
-
-        /* Controls Area */
+        /* --- CONTROLS SECTION --- */
         .controls {
-            padding: 20px;
-            background: rgba(0,0,0,0.8);
-            border-top: 1px solid var(--primary);
+            width: 90%;
+            max-width: 400px;
+            margin-top: 20px;
             display: flex;
             flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-group {
+            display: flex;
             gap: 10px;
-            z-index: 10;
         }
 
         input {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid var(--primary);
-            color: white;
+            flex: 1;
             padding: 12px;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 1.1rem;
-            text-align: center;
-            letter-spacing: 2px;
-            border-radius: 5px;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
         }
 
         button {
+            padding: 12px 20px;
             background: var(--primary);
-            color: black;
+            color: white;
             border: none;
-            padding: 15px;
-            font-size: 1.2rem;
-            font-weight: 800;
+            border-radius: 12px;
+            font-weight: 600;
             cursor: pointer;
-            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-            transition: all 0.3s ease;
+            transition: transform 0.1s;
         }
+        button:active { transform: scale(0.96); }
 
-        button:active { transform: scale(0.95); background: #fff; }
-        button:disabled { background: #333; color: #666; cursor: not-allowed; }
-
-        /* Love Animation Overlay */
-        #love-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            font-size: 5rem;
-            pointer-events: none;
-            z-index: 20;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-shadow: 0 0 30px var(--accent);
-        }
-
-        .show-heart { transform: translate(-50%, -50%) scale(1) !important; }
-
-        /* Loading Screen */
-        #loader {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
+        /* Sensitivity Slider */
+        .slider-container {
+            background: var(--card-bg);
+            padding: 10px 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            z-index: 100;
+            justify-content: space-between;
         }
-        .spinner {
-            width: 50px; height: 50px;
-            border: 5px solid #333;
-            border-top: 5px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .slider-label { font-size: 0.8rem; color: var(--text-sub); }
+        input[type="range"] { width: 60%; }
+
+        /* Gesture Guide */
+        .gesture-guide {
+            margin-top: 15px;
+            display: flex;
+            gap: 20px;
+            opacity: 0.6;
         }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .guide-item { text-align: center; font-size: 0.75rem; color: var(--text-sub); }
+        .emoji { font-size: 1.5rem; display: block; margin-bottom: 2px; }
+
+        /* Loading */
+        #loader {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: white; z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            flex-direction: column;
+        }
 
     </style>
 </head>
 <body>
 
+    <!-- Loader -->
     <div id="loader">
-        <div class="spinner"></div>
-        <p style="margin-top:20px; letter-spacing: 2px;">INITIALIZING AI...</p>
+        <div style="font-weight:600; color:var(--primary);">Loading AI...</div>
     </div>
 
-    <div id="hud-container">
-        <!-- Header -->
-        <div class="header">
-            <div style="font-weight:bold; letter-spacing:1px;">MOCHI ROBOT OS</div>
-            <div id="connection-status" class="status-badge" style="color:#ff0055">OFFLINE</div>
+    <!-- Header -->
+    <header>
+        <h1>Mochi Controller</h1>
+        <div style="margin-top:5px;">
+            <span class="status-dot" id="status-dot"></span>
+            <span class="status-text" id="status-text">AI Initializing...</span>
+        </div>
+    </header>
+
+    <!-- Camera View -->
+    <div class="camera-wrapper">
+        <video id="webcam" autoplay playsinline></video>
+        <canvas id="output_canvas"></canvas>
+        <div id="feedback" class="feedback-overlay">❤️ SENT!</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <!-- Connection -->
+        <div class="input-group">
+            <input type="text" id="robotIp" placeholder="Enter Robot IP (e.g. 192.168.1.5)">
+            <button id="startBtn">Start</button>
         </div>
 
-        <!-- Camera View -->
-        <div class="viewport">
-            <div class="scanner-line"></div>
-            <video id="webcam" autoplay playsinline></video>
-            <canvas id="output_canvas"></canvas>
-            <div id="love-overlay">❤️</div>
-            <div style="position:absolute; bottom:10px; left:10px; background:rgba(0,0,0,0.6); padding:5px; font-size:0.8rem;">
-                FPS: <span id="fps">0</span>
-            </div>
+        <!-- NEW: Sensitivity Slider -->
+        <div class="slider-container">
+            <span class="slider-label">Sensitivity</span>
+            <input type="range" id="sensitivity" min="3" max="8" value="6">
+            <span class="slider-label" id="sens-val">Normal</span>
         </div>
 
-        <!-- Controls -->
-        <div class="controls">
-            <div id="gesture-text" style="text-align:center; font-size:1.5rem; color:var(--primary); height:30px;">
-                WAITING...
-            </div>
-            <input type="text" id="robotIp" placeholder="192.168.X.X">
-            <button id="startBtn">ACTIVATE CAMERA</button>
-            <button id="switchCamBtn" style="background:#333; color:white; font-size:1rem; padding:10px;">SWITCH CAMERA</button>
+        <!-- Switch Camera Button -->
+        <button id="camSwitch" style="background: #e5e7eb; color: #374151;">Switch Camera 📷</button>
+    </div>
+
+    <!-- Gesture Icons Guide -->
+    <div class="gesture-guide">
+        <div class="guide-item">
+            <span class="emoji">🫶</span>
+            Two Hands
+        </div>
+        <div class="guide-item">
+            <span class="emoji">🤟</span>
+            One Hand
         </div>
     </div>
 
     <script type="module">
         import { HandLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
-        // DOM Elements
         const video = document.getElementById("webcam");
         const canvas = document.getElementById("output_canvas");
         const ctx = canvas.getContext("2d");
-        const statusBadge = document.getElementById("connection-status");
-        const gestureText = document.getElementById("gesture-text");
-        const startBtn = document.getElementById("startBtn");
-        const switchCamBtn = document.getElementById("switchCamBtn");
+        const feedback = document.getElementById("feedback");
+        const statusText = document.getElementById("status-text");
+        const statusDot = document.getElementById("status-dot");
         const ipInput = document.getElementById("robotIp");
-        const heartOverlay = document.getElementById("love-overlay");
         const loader = document.getElementById("loader");
+        const startBtn = document.getElementById("startBtn");
+        const sensSlider = document.getElementById("sensitivity");
+        const sensVal = document.getElementById("sens-val");
 
         let handLandmarker = undefined;
-        let lastVideoTime = -1;
-        let lastTriggerTime = 0;
         let isSending = false;
-        let facingMode = "user"; // "user" for front, "environment" for back
+        let lastTrigger = 0;
+        let facingMode = "user";
+        let sensitivity = 0.06; // Default distance threshold
 
-        // Load Saved IP
+        // Load saved IP
         if(localStorage.getItem("robotIP")) ipInput.value = localStorage.getItem("robotIP");
 
         // --- 1. SETUP AI ---
-        async function createHandLandmarker() {
+        async function setupAI() {
             const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm");
             handLandmarker = await HandLandmarker.createFromOptions(vision, {
                 baseOptions: {
@@ -247,150 +238,85 @@
                 },
                 runningMode: "VIDEO",
                 numHands: 2,
-                minHandDetectionConfidence: 0.7,
-                minHandPresenceConfidence: 0.7,
-                minTrackingConfidence: 0.6
+                minHandDetectionConfidence: 0.6,
+                minHandPresenceConfidence: 0.6,
+                minTrackingConfidence: 0.5
             });
             loader.style.display = "none";
+            statusText.innerText = "Ready to Start";
+            statusDot.style.background = "#fbbf24"; // Yellow
         }
-        createHandLandmarker();
+        setupAI();
 
-        // --- 2. CAMERA CONTROLS ---
+        // --- 2. START CAMERA ---
         async function startCamera() {
-            if (!handLandmarker) return;
+            if(!handLandmarker) return;
             localStorage.setItem("robotIP", ipInput.value);
 
-            const constraints = { video: { facingMode: facingMode, width: 640, height: 480 } };
             try {
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: facingMode, width: 640, height: 480 } 
+                });
                 video.srcObject = stream;
-                video.addEventListener("loadeddata", predictWebcam);
-                startBtn.style.display = "none";
-                statusBadge.innerText = "SYSTEM ACTIVE";
-                statusBadge.style.color = "#00f3ff";
-                statusBadge.style.borderColor = "#00f3ff";
+                video.addEventListener("loadeddata", predictLoop);
+                
+                startBtn.innerText = "Active";
+                startBtn.style.background = "#10b981";
+                statusText.innerText = "Scanning for Gestures...";
+                statusDot.style.background = "#10b981"; // Green
             } catch (err) {
-                alert("Camera Error: " + err.message);
+                alert("Camera Error. Please allow permission.");
             }
         }
-
         startBtn.addEventListener("click", startCamera);
-        
-        switchCamBtn.addEventListener("click", () => {
+
+        // Switch Camera
+        document.getElementById("camSwitch").addEventListener("click", () => {
             facingMode = facingMode === "user" ? "environment" : "user";
-            // Restart camera
             if(video.srcObject) {
-                const tracks = video.srcObject.getTracks();
-                tracks.forEach(track => track.stop());
+                video.srcObject.getTracks().forEach(t => t.stop());
                 startCamera();
             }
         });
 
-        // --- 3. GESTURE LOGIC (ACCURATE) ---
-        function detectGestures(landmarks) {
-            let gesture = "";
-            
-            // HEART LOGIC (2 Hands)
-            if (landmarks.length === 2) {
-                const h1 = landmarks[0];
-                const h2 = landmarks[1];
-                
-                // Index Tips Distance (Point 8)
-                const distIndex = Math.hypot(h1[8].x - h2[8].x, h1[8].y - h2[8].y);
-                // Thumb Tips Distance (Point 4)
-                const distThumb = Math.hypot(h1[4].x - h2[4].x, h1[4].y - h2[4].y);
-                
-                // Threshold very tight (0.06) for accuracy
-                if (distIndex < 0.06 && distThumb < 0.06) {
-                    return "HEART ❤️";
-                }
-            }
+        // Sensitivity Control logic
+        sensSlider.addEventListener("input", (e) => {
+            const val = e.target.value;
+            // Map 1-10 to 0.01 - 0.10
+            sensitivity = val / 100;
+            if(val < 4) sensVal.innerText = "Strict";
+            else if(val > 7) sensVal.innerText = "Loose";
+            else sensVal.innerText = "Normal";
+        });
 
-            // ILY LOGIC (1 Hand)
-            for (const lm of landmarks) {
-                // Logic: Index(8) & Pinky(20) must be extended (Tip < PIP)
-                // Middle(12) & Ring(16) must be folded (Tip > PIP)
-                // Note: Y increases downwards in canvas
-                
-                const isIndexOpen = lm[8].y < lm[6].y;
-                const isPinkyOpen = lm[20].y < lm[18].y;
-                const isMidClosed = lm[12].y > lm[10].y;
-                const isRingClosed = lm[16].y > lm[14].y;
-                const isThumbOpen = lm[4].x < lm[3].x; // Simple check, depends on hand side
-
-                // Just checking Index/Pinky UP and Mid/Ring DOWN is usually enough
-                if (isIndexOpen && isPinkyOpen && isMidClosed && isRingClosed) {
-                    return "ILY SIGN 🤟";
-                }
-            }
-
-            return "";
-        }
-
-        // --- 4. PREDICTION LOOP ---
-        async function predictWebcam() {
+        // --- 3. MAIN LOOP ---
+        async function predictLoop() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            let startTimeMs = performance.now();
+            let lastVideoTime = -1;
 
-            if (handLandmarker && video.currentTime !== lastVideoTime) {
-                lastVideoTime = video.currentTime;
-                const results = handLandmarker.detectForVideo(video, startTimeMs);
+            async function render() {
+                if(video.currentTime !== lastVideoTime) {
+                    lastVideoTime = video.currentTime;
+                    const results = handLandmarker.detectForVideo(video, performance.now());
 
-                ctx.save();
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                if (results.landmarks) {
-                    // Draw Skeleton
-                    for (const landmarks of results.landmarks) {
-                        drawSkeleton(landmarks);
-                    }
-                    
-                    // Logic
-                    const detectedGesture = detectGestures(results.landmarks);
-                    
-                    if (detectedGesture) {
-                        gestureText.innerText = detectedGesture;
-                        gestureText.style.color = "#00ff00";
-                        gestureText.style.textShadow = "0 0 10px #00ff00";
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                        // Trigger Robot (With 5s Cooldown)
-                        const now = Date.now();
-                        if (now - lastTriggerTime > 5000 && !isSending) {
-                            lastTriggerTime = now;
-                            triggerRobot();
+                    if(results.landmarks) {
+                        for(const landmarks of results.landmarks) {
+                            drawSimpleHand(landmarks); // Simplified Drawing
                         }
-                    } else {
-                        gestureText.innerText = "SCANNING...";
-                        gestureText.style.color = "#00f3ff";
-                        gestureText.style.textShadow = "none";
+                        checkGestures(results.landmarks);
                     }
                 }
-                ctx.restore();
+                requestAnimationFrame(render);
             }
-            window.requestAnimationFrame(predictWebcam);
+            render();
         }
 
-        // --- 5. VISUALS ---
-        function drawSkeleton(landmarks) {
-            ctx.lineWidth = 3;
-            ctx.lineCap = "round";
-            ctx.strokeStyle = "#00f3ff";
-            ctx.fillStyle = "#ff0055";
-
-            // Draw Connections (Simplified)
-            const connections = [[0,1],[1,2],[2,3],[3,4], [0,5],[5,6],[6,7],[7,8], [5,9],[9,10],[10,11],[11,12], [9,13],[13,14],[14,15],[15,16], [13,17],[17,18],[18,19],[19,20], [0,17]];
-            
-            for(let conn of connections) {
-                const p1 = landmarks[conn[0]];
-                const p2 = landmarks[conn[1]];
-                ctx.beginPath();
-                ctx.moveTo(p1.x * canvas.width, p1.y * canvas.height);
-                ctx.lineTo(p2.x * canvas.width, p2.y * canvas.height);
-                ctx.stroke();
-            }
-
-            // Draw Joints
+        // --- 4. IMPROVED DRAWING (Simple Dots) ---
+        function drawSimpleHand(landmarks) {
+            ctx.fillStyle = "rgba(79, 70, 229, 0.6)"; // Indigo transparent
             for(let p of landmarks) {
                 ctx.beginPath();
                 ctx.arc(p.x * canvas.width, p.y * canvas.height, 4, 0, 2*Math.PI);
@@ -398,45 +324,82 @@
             }
         }
 
-        // --- 6. NETWORK TRIGGER ---
-        function triggerRobot() {
-            const ip = ipInput.value.trim();
-            if(ip.length < 7) { 
-                alert("Please enter a valid IP!"); 
-                return; 
+        // --- 5. GESTURE LOGIC ---
+        function checkGestures(allHands) {
+            let triggered = false;
+            let gestureName = "";
+
+            // A. HEART (2 Hands)
+            if(allHands.length === 2) {
+                const h1 = allHands[0];
+                const h2 = allHands[1];
+                const dIndex = Math.hypot(h1[8].x - h2[8].x, h1[8].y - h2[8].y);
+                const dThumb = Math.hypot(h1[4].x - h2[4].x, h1[4].y - h2[4].y);
+
+                if(dIndex < sensitivity && dThumb < sensitivity) {
+                    triggered = true;
+                    gestureName = "HEART ❤️";
+                }
             }
 
-            isSending = true;
-            statusBadge.innerText = "TRANSMITTING...";
-            statusBadge.style.color = "#ffaa00";
-
-            // Visual feedback
-            heartOverlay.classList.add("show-heart");
-            setTimeout(() => heartOverlay.classList.remove("show-heart"), 1000);
-
-            // Fetch Request
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2000);
-
-            fetch(`http://${ip}/api/love`, { signal: controller.signal })
-                .then(response => {
-                    if(response.ok) {
-                        statusBadge.innerText = "SIGNAL RECEIVED";
-                        statusBadge.style.color = "#00ff00";
-                    } else {
-                        throw new Error("Robot Rejected");
+            // B. ILY (1 Hand)
+            // Index & Pinky UP. Mid & Ring DOWN.
+            if(!triggered) {
+                for(const lm of allHands) {
+                    const idxUp = lm[8].y < lm[6].y;
+                    const pnkUp = lm[20].y < lm[18].y;
+                    const midDown = lm[12].y > lm[10].y;
+                    const rngDown = lm[16].y > lm[14].y;
+                    
+                    if(idxUp && pnkUp && midDown && rngDown) {
+                        triggered = true;
+                        gestureName = "LOVE 🤟";
                     }
+                }
+            }
+
+            if(triggered) {
+                const now = Date.now();
+                if(now - lastTrigger > 5000 && !isSending) {
+                    lastTrigger = now;
+                    sendSignal(gestureName);
+                }
+            }
+        }
+
+        // --- 6. SEND TO ROBOT ---
+        function sendSignal(name) {
+            const ip = ipInput.value;
+            if(ip.length < 5) return;
+
+            isSending = true;
+            statusText.innerText = "Sending Signal...";
+            
+            // Show Feedback Overlay
+            feedback.innerText = name + " SENT!";
+            feedback.style.opacity = "1";
+            feedback.style.transform = "translate(-50%, -50%) scale(1.1)";
+            
+            setTimeout(() => {
+                feedback.style.opacity = "0";
+                feedback.style.transform = "translate(-50%, -50%) scale(1)";
+            }, 1500);
+
+            // Fetch
+            fetch(`http://${ip}/api/love`)
+                .then(() => {
+                    statusText.innerText = "Delivered!";
+                    statusText.style.color = "#10b981";
                 })
-                .catch(err => {
-                    console.error(err);
-                    statusBadge.innerText = "LINK FAILED";
-                    statusBadge.style.color = "#ff0000";
+                .catch(() => {
+                    statusText.innerText = "Connection Failed";
+                    statusText.style.color = "#ef4444";
                 })
                 .finally(() => {
                     isSending = false;
                     setTimeout(() => {
-                        statusBadge.innerText = "SYSTEM ACTIVE";
-                        statusBadge.style.color = "#00f3ff";
+                        statusText.innerText = "Scanning for Gestures...";
+                        statusText.style.color = "#6b7280";
                     }, 2000);
                 });
         }
