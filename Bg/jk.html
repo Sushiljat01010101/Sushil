@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.js" crossorigin="anonymous"></script>
     <!-- Python-like Monospace Font -->
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --bg: #0d1117;
@@ -165,7 +165,7 @@
         <div class="video-wrapper">
             <video id="webcam" autoplay playsinline></video>
             <canvas id="output_canvas"></canvas>
-            
+
             <!-- Tech Stats -->
             <div class="data-overlay">
                 <div>FPS: <span id="fps-val" style="color:var(--success)">0</span></div>
@@ -220,7 +220,7 @@
             let colorClass = "log-info";
             if(type === "error") colorClass = "log-warn";
             if(type === "success") colorClass = "log-success";
-            
+
             line.innerHTML = `<span class="log-time">[${time}]</span> <span class="${colorClass}">${msg}</span>`;
             consoleDiv.appendChild(line);
             consoleDiv.scrollTop = consoleDiv.scrollHeight;
@@ -314,7 +314,7 @@
                     lastVideoTime = video.currentTime;
                     const startTime = performance.now();
                     const results = handLandmarker.detectForVideo(video, startTime);
-                    
+
                     // Calc FPS
                     const totalTime = performance.now() - fpsTime;
                     fpsVal.innerText = Math.round(1000/totalTime);
@@ -324,7 +324,7 @@
 
                     if (results.landmarks && results.landmarks.length > 0) {
                         confVal.innerText = (results.handednesses[0][0].score).toFixed(2);
-                        
+
                         // Draw Skeleton (Green Tech Style)
                         for (const landmarks of results.landmarks) {
                             drawTechHand(landmarks);
@@ -394,7 +394,7 @@
                     const midOpen = isFingerOpen(lm, 3); // Middle (12)
                     const rngOpen = isFingerOpen(lm, 4); // Ring (16)
                     const pnkOpen = isFingerOpen(lm, 5); // Pinky (20)
-                    
+
                     // Thumb Extended Logic (Using Angle)
                     // Calculate angle at MCP joint (2) using Wrist(0) and Tip(4)
                     // Or simpler distance check from Index MCP (5)
@@ -425,7 +425,7 @@
             if(gesture) {
                 modeVal.innerText = gesture;
                 modeVal.style.color = endpoint === "angry" ? "#ff7b72" : "#a5d6ff";
-                
+
                 showPopup(gesture, endpoint === "angry" ? "red" : "blue");
 
                 const now = Date.now();
