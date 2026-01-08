@@ -29,7 +29,6 @@
             background-size: 40px 40px;
         }
 
-        /* Scanline Effect */
         body::after {
             content: "";
             position: fixed;
@@ -89,7 +88,6 @@
             transform: scaleX(-1);
         }
 
-        /* Overlay UI Elements */
         .ui-corners::before, .ui-corners::after {
             content: "";
             position: absolute;
@@ -112,13 +110,6 @@
             border: 1px solid rgba(0, 243, 255, 0.3);
             border-radius: 50%;
             z-index: 5;
-        }
-
-        .reticle::before {
-            content: "";
-            position: absolute;
-            top: 50%; left: -10px; right: -10px;
-            height: 1px; background: rgba(0, 243, 255, 0.3);
         }
 
         .data-panel {
@@ -159,10 +150,6 @@
             align-items: center;
         }
 
-        .ip-input-wrapper {
-            position: relative;
-        }
-
         input {
             width: 100%;
             background: var(--glass);
@@ -174,8 +161,6 @@
             outline: none;
             transition: 0.3s;
         }
-
-        input:focus { border-color: var(--neon); background: rgba(0, 243, 255, 0.05); }
 
         .btn {
             padding: 12px 25px;
@@ -197,16 +182,6 @@
             border: none;
             font-weight: 700;
         }
-
-        .btn-main:hover {
-            box-shadow: 0 0 20px var(--neon);
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 600px) {
-            .controls-bar { grid-template-columns: 1fr; }
-            .data-panel { display: none; }
-        }
     </style>
 </head>
 <body>
@@ -223,7 +198,6 @@
             <video id="webcam" autoplay playsinline></video>
             <canvas id="canvas"></canvas>
             
-            <!-- HUD DECOR -->
             <div class="ui-corners ui-tl"></div>
             <div class="ui-corners ui-tr"></div>
             <div class="ui-corners ui-bl"></div>
@@ -231,10 +205,9 @@
             <div class="reticle"></div>
 
             <div class="data-panel" id="stats">
-                LATENCY: --ms<br>
-                THREAT: LOW<br>
-                COORDS: 0.0, 0.0<br>
-                BUFFER: ACTIVE
+                MODE: HYBRID_SENSE<br>
+                FACE: <span id="face-stat">OFF</span><br>
+                HAND: <span id="hand-stat">OFF</span>
             </div>
 
             <div id="alert" class="alert-toast">SIGNAL DETECTED</div>
@@ -250,7 +223,7 @@
     </div>
 
     <script type="module">
-        import { HandLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
+        import { HandLandmarker, FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
         const video = document.getElementById("webcam");
         const canvas = document.getElementById("canvas");
@@ -260,132 +233,117 @@
         const alertBox = document.getElementById("alert");
         const fpsDisp = document.getElementById("fps-display");
 
-        let handLandmarker;
+        let handLandmarker, faceLandmarker;
         let lastTrigger = 0;
         let lastVideoTime = -1;
 
         async function bootstrap() {
             try {
                 const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm");
+                
                 handLandmarker = await HandLandmarker.createFromOptions(vision, {
                     baseOptions: {
                         modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
                         delegate: "GPU"
                     },
                     runningMode: "VIDEO",
-                    numHands: 2,
-                    minHandDetectionConfidence: 0.7,
-                    minTrackingConfidence: 0.6
+                    numHands: 1
                 });
-                console.log("AI Ready");
-            } catch (e) {
-                alert("Model Load Failed");
-            }
+
+                faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
+                    baseOptions: {
+                        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+                        delegate: "GPU"
+                    },
+                    runningMode: "VIDEO",
+                    outputFaceBlendshapes: true
+                });
+
+                console.log("Hybrid AI Ready");
+            } catch (e) { console.error(e); }
         }
 
         document.getElementById("initBtn").onclick = async () => {
-            if (!handLandmarker) return;
-            const ip = ipInput.value.trim();
-            if (!ip) return;
-            localStorage.setItem("mochi_v4_ip", ip);
-
+            if (!handLandmarker || !faceLandmarker) return;
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { width: 1920, height: 1080, facingMode: "user" } 
-                });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.srcObject = stream;
                 video.onloadeddata = runProcess;
                 connState.innerText = "LINKED";
                 connState.style.color = "#00f3ff";
-            } catch (err) {
-                alert("Camera Access Denied");
-            }
+            } catch (err) { alert("Camera Denied"); }
         };
-
-        if (localStorage.getItem("mochi_v4_ip")) ipInput.value = localStorage.getItem("mochi_v4_ip");
 
         async function runProcess() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            let frames = 0;
-            let lastTime = performance.now();
-
+            
             async function loop() {
                 if (video.currentTime !== lastVideoTime) {
                     lastVideoTime = video.currentTime;
-                    const results = handLandmarker.detectForVideo(video, performance.now());
+                    const hRes = handLandmarker.detectForVideo(video, performance.now());
+                    const fRes = faceLandmarker.detectForVideo(video, performance.now());
                     
-                    frames++;
-                    const now = performance.now();
-                    if (now - lastTime >= 1000) {
-                        fpsDisp.innerText = `FPS: ${frames}`;
-                        frames = 0;
-                        lastTime = now;
-                    }
-
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    if (results.landmarks && results.landmarks.length > 0) {
-                        results.landmarks.forEach(renderSkeleton);
-                        analyzeGestures(results.landmarks);
-                    }
+                    
+                    if (hRes.landmarks) hRes.landmarks.forEach(renderHand);
+                    if (fRes.faceLandmarks) fRes.faceLandmarks.forEach(renderFace);
+                    
+                    processLogic(hRes, fRes);
                 }
                 requestAnimationFrame(loop);
             }
             loop();
         }
 
-        function renderSkeleton(lm) {
-            ctx.strokeStyle = "rgba(0, 243, 255, 0.8)";
-            ctx.lineWidth = 2;
-            
+        function renderHand(lm) {
+            ctx.strokeStyle = "rgba(0, 243, 255, 0.5)";
             HandLandmarker.HAND_CONNECTIONS.forEach(c => {
-                const start = lm[c.start], end = lm[c.end];
-                ctx.beginPath();
-                ctx.moveTo(start.x * canvas.width, start.y * canvas.height);
-                ctx.lineTo(end.x * canvas.width, end.y * canvas.height);
-                ctx.stroke();
-            });
-
-            lm.forEach(p => {
-                ctx.fillStyle = "#fff";
-                ctx.beginPath();
-                ctx.arc(p.x * canvas.width, p.y * canvas.height, 2, 0, Math.PI * 2);
-                ctx.fill();
+                const s = lm[c.start], e = lm[c.end];
+                ctx.beginPath(); ctx.moveTo(s.x*canvas.width, s.y*canvas.height); ctx.lineTo(e.x*canvas.width, e.y*canvas.height); ctx.stroke();
             });
         }
 
-        function analyzeGestures(hands) {
+        function renderFace(lm) {
+            ctx.fillStyle = "rgba(0, 243, 255, 0.2)";
+            lm.forEach(p => { ctx.beginPath(); ctx.arc(p.x*canvas.width, p.y*canvas.height, 1, 0, 7); ctx.fill(); });
+        }
+
+        function processLogic(h, f) {
             let cmd = "", label = "";
-            
-            const isOpen = (h, i) => h[i*4].y < h[i*4-2].y;
 
-            if (hands.length === 2) {
-                const d = Math.hypot(hands[0][8].x - hands[1][8].x, hands[0][8].y - hands[1][8].y);
-                if (d < 0.07) { cmd = "love"; label = "HEART_PROTOCOL"; }
+            // 1. Face Expression Detection (Highest Priority)
+            if (f.faceBlendshapes && f.faceBlendshapes.length > 0) {
+                const shapes = f.faceBlendshapes[0].categories;
+                const getVal = (name) => shapes.find(s => s.categoryName === name)?.score || 0;
+
+                const smile = (getVal("mouthSmileLeft") + getVal("mouthSmileRight")) / 2;
+                const browDown = (getVal("browDownLeft") + getVal("browDownRight")) / 2;
+                const browUp = (getVal("browInnerUp") + getVal("browOuterUpLeft") + getVal("browOuterUpRight")) / 3;
+
+                if (smile > 0.4) { cmd = "funny"; label = "USER_HAPPY_DETECTED"; }
+                else if (browDown > 0.4) { cmd = "angry"; label = "USER_ANGRY_DETECTED"; }
+                else if (browUp > 0.4) { cmd = "love"; label = "USER_SURPRISED_DETECTED"; }
             }
 
-            if (!cmd) {
-                hands.forEach(h => {
-                    const idx = isOpen(h, 2), mid = isOpen(h, 3), rng = isOpen(h, 4), pnk = isOpen(h, 5);
-                    const thm = Math.hypot(h[4].x - h[5].x, h[4].y - h[5].y) > 0.05;
-
-                    if (idx && thm && !mid && !rng && !pnk) { cmd = "angry"; label = "AGGRESSION_DETECTED"; }
-                    else if (idx && pnk && thm && !mid && !rng) { cmd = "love"; label = "AFFECTION_SIGNAL"; }
-                    else if (idx && mid && rng && pnk && thm) { cmd = "funny"; label = "PLAY_INITIATED"; }
-                });
+            // 2. Hand Gesture Fallback
+            if (!cmd && h.landmarks && h.landmarks.length > 0) {
+                const lm = h.landmarks[0];
+                const dHeart = h.landmarks.length === 2 ? Math.hypot(h.landmarks[0][8].x-h.landmarks[1][8].x, h.landmarks[0][8].y-h.landmarks[1][8].y) : 1;
+                if (dHeart < 0.07) { cmd = "love"; label = "HEART_PROTOCOL"; }
             }
 
-            if (cmd && Date.now() - lastTrigger > 3000) {
+            if (cmd && Date.now() - lastTrigger > 4000) {
                 lastTrigger = Date.now();
-                showInfo(label);
+                showToast(label);
                 fetch(`http://${ipInput.value}/api/${cmd}`, { mode: 'no-cors' }).catch(() => {});
             }
         }
 
-        function showInfo(txt) {
+        function showToast(txt) {
             alertBox.innerText = txt;
             alertBox.style.opacity = 1;
-            setTimeout(() => alertBox.style.opacity = 0, 1500);
+            setTimeout(() => alertBox.style.opacity = 0, 2000);
         }
 
         bootstrap();
