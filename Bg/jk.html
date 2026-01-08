@@ -3,350 +3,518 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>MOCHI NEURAL LINK</title>
+    <title>Mochi AI Ultimate</title>
+    <!-- Google MediaPipe -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.js" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Python-like Font -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --neon: #00f3ff;
-            --deep: #0a0a0f;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(0, 243, 255, 0.2);
-            --font-main: 'Outfit', sans-serif;
-            --font-tech: 'Syncopate', sans-serif;
+            --bg: #0d1117;
+            --panel: #161b22;
+            --border: #30363d;
+            --accent: #58a6ff;
+            --mic-active: #f778ba; /* Pink for Voice */
+            --keyword: #ff7b72;
+            --success: #3fb950;
+            --text: #c9d1d9;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            background: var(--deep);
-            color: #fff;
-            font-family: var(--font-main);
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            margin: 0;
             height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
-            background-image: 
-                radial-gradient(circle at 2px 2px, rgba(0, 243, 255, 0.05) 1px, transparent 0);
-            background-size: 40px 40px;
         }
 
-        body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-            background-size: 100% 4px, 3px 100%;
-            pointer-events: none;
-            z-index: 999;
-        }
-
-        .container {
-            height: 100%;
-            display: grid;
-            grid-template-rows: auto 1fr auto;
-            padding: 20px;
-            gap: 20px;
-        }
-
-        header {
+        .terminal-header {
+            background: var(--panel);
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 15px;
+        }
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #238636;
+            color: white;
         }
 
-        .title-unit h1 {
-            font-family: var(--font-tech);
-            font-size: 0.9rem;
-            letter-spacing: 5px;
-            color: var(--neon);
-            text-shadow: 0 0 15px var(--neon);
-        }
-
-        .sys-info {
-            font-size: 0.6rem;
-            opacity: 0.5;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .viewport-wrapper {
+        .main-container {
+            flex: 1;
             position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            aspect-ratio: 4/3;
+            border: 2px solid var(--border);
+            border-radius: 8px;
             background: #000;
-            border: 1px solid var(--border);
-            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
             overflow: hidden;
-            box-shadow: 0 0 40px rgba(0, 243, 255, 0.05);
         }
 
         video, canvas {
-            position: absolute;
-            width: 100%;
-            height: 100%;
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
             object-fit: cover;
             transform: scaleX(-1);
         }
 
-        .ui-corners::before, .ui-corners::after {
-            content: "";
+        .data-overlay {
             position: absolute;
-            width: 40px;
-            height: 40px;
-            border: 2px solid var(--neon);
+            top: 10px; left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            pointer-events: none;
+            border-left: 3px solid var(--accent);
+        }
+
+        /* Voice Status Indicator */
+        .voice-overlay {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            display: none; /* Hidden by default */
+            border-right: 3px solid var(--mic-active);
+            color: var(--mic-active);
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; text-shadow: 0 0 10px var(--mic-active); }
+            100% { opacity: 0.7; }
+        }
+
+        .gesture-popup {
+            position: absolute;
+            bottom: 20px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(22, 27, 34, 0.95);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.2s;
             z-index: 10;
         }
 
-        .ui-tl { top: 20px; left: 20px; border-right: 0; border-bottom: 0; }
-        .ui-tr { top: 20px; right: 20px; border-left: 0; border-bottom: 0; }
-        .ui-bl { bottom: 20px; left: 20px; border-right: 0; border-top: 0; }
-        .ui-br { bottom: 20px; right: 20px; border-left: 0; border-top: 0; }
-
-        .reticle {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 100px; height: 100px;
-            transform: translate(-50%, -50%);
-            border: 1px solid rgba(0, 243, 255, 0.3);
-            border-radius: 50%;
-            z-index: 5;
-        }
-
-        .data-panel {
-            position: absolute;
-            top: 40px;
-            right: 40px;
-            text-align: right;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.7rem;
-            color: var(--neon);
-            line-height: 1.5;
-            z-index: 20;
-        }
-
-        .alert-toast {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 243, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--neon);
-            padding: 12px 30px;
-            border-radius: 4px;
-            font-family: var(--font-tech);
+        .console-logs {
+            height: 150px;
+            background: var(--panel);
+            border-top: 1px solid var(--border);
+            padding: 10px;
             font-size: 0.8rem;
-            letter-spacing: 2px;
-            color: var(--neon);
-            opacity: 0;
-            transition: all 0.3s;
-            z-index: 100;
+            overflow-y: auto;
+            color: #8b949e;
         }
+        .log-line { margin-bottom: 4px; }
+        .log-time { color: var(--accent); margin-right: 5px; }
+        .log-voice { color: var(--mic-active); } /* New color for voice logs */
+        .log-info { color: #a5d6ff; }
+        .log-warn { color: var(--keyword); }
+        .log-success { color: var(--success); }
 
-        .controls-bar {
-            display: grid;
-            grid-template-columns: 1fr auto auto;
-            gap: 15px;
-            align-items: center;
+        .controls {
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            background: var(--bg);
         }
-
         input {
-            width: 100%;
-            background: var(--glass);
+            background: var(--panel);
             border: 1px solid var(--border);
-            padding: 12px 20px;
-            border-radius: 10px;
-            color: #fff;
-            font-family: var(--font-main);
-            outline: none;
-            transition: 0.3s;
+            color: white;
+            padding: 8px;
+            font-family: inherit;
+            flex: 1;
+            border-radius: 4px;
         }
-
-        .btn {
-            padding: 12px 25px;
-            border-radius: 10px;
-            font-family: var(--font-tech);
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: #fff;
-        }
-
-        .btn-main {
-            background: var(--neon);
-            color: #000;
+        button {
+            background: var(--accent);
+            color: black;
             border: none;
-            font-weight: 700;
+            padding: 8px 15px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
         }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Specific Button Styles */
+        #voiceBtn { background: var(--border); color: white; }
+        #voiceBtn.active { background: var(--mic-active); color: black; }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="title-unit">
-                <h1>MOCHI_OS_V4.0</h1>
-                <div class="sys-info">NEURAL LINK: <span id="conn-state" style="color:red">OFFLINE</span></div>
-            </div>
-            <div id="fps-display" style="font-family: monospace; font-size: 10px; opacity: 0.5;">FPS: 00</div>
-        </header>
 
-        <main class="viewport-wrapper">
+    <div class="terminal-header">
+        <span>root@mochi-ai:~/vision_voice $</span>
+        <span id="sys-status" class="status-badge" style="background:#8b949e;">INIT</span>
+    </div>
+
+    <div class="main-container">
+        <div class="video-wrapper">
             <video id="webcam" autoplay playsinline></video>
-            <canvas id="canvas"></canvas>
+            <canvas id="output_canvas"></canvas>
             
-            <div class="ui-corners ui-tl"></div>
-            <div class="ui-corners ui-tr"></div>
-            <div class="ui-corners ui-bl"></div>
-            <div class="ui-corners ui-br"></div>
-            <div class="reticle"></div>
-
-            <div class="data-panel" id="stats">
-                MODE: HYBRID_SENSE<br>
-                FACE: <span id="face-stat">OFF</span><br>
-                HAND: <span id="hand-stat">OFF</span>
+            <!-- Tech Stats -->
+            <div class="data-overlay">
+                <div>FPS: <span id="fps-val" style="color:var(--success)">0</span></div>
+                <div>CONF: <span id="conf-val">0.00</span></div>
+                <div>MODE: <span id="mode-val">IDLE</span></div>
             </div>
 
-            <div id="alert" class="alert-toast">SIGNAL DETECTED</div>
-        </main>
+            <!-- Voice Status -->
+            <div id="voice-indicator" class="voice-overlay">● LISTENING</div>
 
-        <footer class="controls-bar">
-            <div class="ip-input-wrapper">
-                <input type="text" id="targetIp" placeholder="ROBOT_IP_ADDRESS: 192.168.X.X">
-            </div>
-            <button class="btn btn-main" id="initBtn">SYNC</button>
-            <button class="btn" onclick="location.reload()">REBOOT</button>
-        </footer>
+            <div id="popup" class="gesture-popup">NO GESTURE</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <input type="text" id="robotIp" placeholder="192.168.X.X">
+        <button id="startBtn">START SYSTEM</button>
+        <button id="voiceBtn">MIC: OFF</button>
+        <button id="camSwitch" style="background:var(--border); color:white;">CAM</button>
+    </div>
+
+    <div class="console-logs" id="console">
+        <div class="log-line">> system ready... waiting for user input.</div>
     </div>
 
     <script type="module">
-        import { HandLandmarker, FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
+        import { HandLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
+        // UI Elements
         const video = document.getElementById("webcam");
-        const canvas = document.getElementById("canvas");
+        const canvas = document.getElementById("output_canvas");
         const ctx = canvas.getContext("2d");
-        const ipInput = document.getElementById("targetIp");
-        const connState = document.getElementById("conn-state");
-        const alertBox = document.getElementById("alert");
-        const fpsDisp = document.getElementById("fps-display");
+        const consoleDiv = document.getElementById("console");
+        const ipInput = document.getElementById("robotIp");
+        const sysStatus = document.getElementById("sys-status");
+        const popup = document.getElementById("popup");
+        const fpsVal = document.getElementById("fps-val");
+        const confVal = document.getElementById("conf-val");
+        const modeVal = document.getElementById("mode-val");
+        const voiceBtn = document.getElementById("voiceBtn");
+        const voiceIndicator = document.getElementById("voice-indicator");
 
-        let handLandmarker, faceLandmarker;
-        let lastTrigger = 0;
+        // System Variables
+        let handLandmarker = undefined;
+        let lastTriggerTime = 0;
+        let isProcessing = false;
+        let facingMode = "user";
         let lastVideoTime = -1;
+        
+        // Voice Variables
+        let recognition = null;
+        let isListening = false;
 
-        async function bootstrap() {
+        // --- UTILS: LOGGING ---
+        function log(msg, type="info") {
+            const line = document.createElement("div");
+            line.className = "log-line";
+            const time = new Date().toLocaleTimeString().split(" ")[0];
+            let colorClass = "log-info";
+            if(type === "error") colorClass = "log-warn";
+            if(type === "success") colorClass = "log-success";
+            if(type === "voice") colorClass = "log-voice";
+            
+            line.innerHTML = `<span class="log-time">[${time}]</span> <span class="${colorClass}">${msg}</span>`;
+            consoleDiv.appendChild(line);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        // --- 1. SETUP MEDIA PIPE ---
+        async function setupAI() {
+            log("Loading AI Modules...", "info");
             try {
                 const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm");
-                
                 handLandmarker = await HandLandmarker.createFromOptions(vision, {
                     baseOptions: {
                         modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
                         delegate: "GPU"
                     },
                     runningMode: "VIDEO",
-                    numHands: 1
+                    numHands: 2,
+                    minHandDetectionConfidence: 0.7
                 });
+                log("Vision AI Loaded.", "success");
+                sysStatus.innerText = "READY";
+                sysStatus.style.background = "#238636";
+            } catch (e) {
+                log("Error loading AI: " + e, "error");
+            }
+        }
+        setupAI();
 
-                faceLandmarker = await FaceLandmarker.createFromOptions(vision, {
-                    baseOptions: {
-                        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
-                        delegate: "GPU"
-                    },
-                    runningMode: "VIDEO",
-                    outputFaceBlendshapes: true
+        // --- 2. SETUP VOICE RECOGNITION (New Future) ---
+        function setupVoice() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                log("Browser does not support Voice API.", "error");
+                voiceBtn.disabled = true;
+                voiceBtn.innerText = "NO MIC";
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;    // Keep listening
+            recognition.interimResults = false; // Only final results
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isListening = true;
+                voiceBtn.classList.add("active");
+                voiceBtn.innerText = "MIC: ON";
+                voiceIndicator.style.display = "block";
+                log("Microphone Active. Listening...", "voice");
+            };
+
+            recognition.onend = () => {
+                // Auto-restart if it was supposed to be on
+                if (isListening) {
+                    recognition.start();
+                } else {
+                    voiceBtn.classList.remove("active");
+                    voiceBtn.innerText = "MIC: OFF";
+                    voiceIndicator.style.display = "none";
+                    log("Microphone Stopped.", "info");
+                }
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+                log(`Heard: "${transcript}"`, "voice");
+                processVoiceCommand(transcript);
+            };
+
+            recognition.onerror = (event) => {
+                log("Mic Error: " + event.error, "error");
+            };
+        }
+        setupVoice(); // Initialize
+
+        // --- 3. EVENT LISTENERS ---
+        document.getElementById("startBtn").addEventListener("click", startCamera);
+        
+        voiceBtn.addEventListener("click", () => {
+            if (!recognition) return;
+            if (isListening) {
+                isListening = false;
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        });
+
+        document.getElementById("camSwitch").addEventListener("click", () => {
+            facingMode = facingMode === "user" ? "environment" : "user";
+            if(video.srcObject) {
+                video.srcObject.getTracks().forEach(t => t.stop());
+                startCamera();
+            }
+        });
+
+        // --- 4. START CAMERA ---
+        async function startCamera() {
+            if(!handLandmarker) return;
+            const ip = ipInput.value;
+            if(ip.length < 7) { log("Invalid IP Address", "error"); return; }
+            localStorage.setItem("robotIP", ip);
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: facingMode, width: 640, height: 480 } 
                 });
+                video.srcObject = stream;
+                video.addEventListener("loadeddata", predictWebcam);
+                log("Camera Stream Started.", "info");
+                document.getElementById("startBtn").disabled = true;
+            } catch (err) {
+                log("Camera Permission Denied.", "error");
+            }
+        }
+        if(localStorage.getItem("robotIP")) ipInput.value = localStorage.getItem("robotIP");
 
-                console.log("Hybrid AI Ready");
-            } catch (e) { console.error(e); }
+        // --- 5. PROCESSING LOOPS ---
+        
+        // A. VOICE LOGIC
+        function processVoiceCommand(text) {
+            // Check for Keywords
+            if (text.includes("love")) {
+                modeVal.innerText = "VOICE: LOVE";
+                showPopup("VOICE: LOVE ❤️", "blue");
+                sendToRobot("love", "Voice Command");
+            } 
+            else if (text.includes("angry") || text.includes("anger") || text.includes("hate")) {
+                modeVal.innerText = "VOICE: ANGRY";
+                showPopup("VOICE: ANGRY 😡", "red");
+                sendToRobot("angry", "Voice Command");
+            }
         }
 
-        document.getElementById("initBtn").onclick = async () => {
-            if (!handLandmarker || !faceLandmarker) return;
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject = stream;
-                video.onloadeddata = runProcess;
-                connState.innerText = "LINKED";
-                connState.style.color = "#00f3ff";
-            } catch (err) { alert("Camera Denied"); }
-        };
+        // B. VISION LOGIC
+        function isFingerOpen(lm, fingerIndex) {
+            const tip = fingerIndex * 4;
+            const pip = (fingerIndex * 4) - 2;
+            return lm[tip].y < lm[pip].y;
+        }
 
-        async function runProcess() {
+        async function predictWebcam() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            
-            async function loop() {
-                if (video.currentTime !== lastVideoTime) {
+            let fpsTime = performance.now();
+
+            async function render() {
+                if(video.currentTime !== lastVideoTime) {
                     lastVideoTime = video.currentTime;
-                    const hRes = handLandmarker.detectForVideo(video, performance.now());
-                    const fRes = faceLandmarker.detectForVideo(video, performance.now());
+                    const startTime = performance.now();
+                    const results = handLandmarker.detectForVideo(video, startTime);
                     
+                    const totalTime = performance.now() - fpsTime;
+                    fpsVal.innerText = Math.round(1000/totalTime);
+                    fpsTime = performance.now();
+
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    
-                    if (hRes.landmarks) hRes.landmarks.forEach(renderHand);
-                    if (fRes.faceLandmarks) fRes.faceLandmarks.forEach(renderFace);
-                    
-                    processLogic(hRes, fRes);
+
+                    if (results.landmarks && results.landmarks.length > 0) {
+                        confVal.innerText = (results.handednesses[0][0].score).toFixed(2);
+                        for (const landmarks of results.landmarks) {
+                            drawTechHand(landmarks);
+                        }
+                        processGestures(results.landmarks);
+                    } else {
+                        confVal.innerText = "0.00";
+                        if(!modeVal.innerText.includes("VOICE")) modeVal.innerText = "IDLE";
+                    }
                 }
-                requestAnimationFrame(loop);
+                requestAnimationFrame(render);
             }
-            loop();
+            render();
         }
 
-        function renderHand(lm) {
-            ctx.strokeStyle = "rgba(0, 243, 255, 0.5)";
-            HandLandmarker.HAND_CONNECTIONS.forEach(c => {
-                const s = lm[c.start], e = lm[c.end];
-                ctx.beginPath(); ctx.moveTo(s.x*canvas.width, s.y*canvas.height); ctx.lineTo(e.x*canvas.width, e.y*canvas.height); ctx.stroke();
-            });
-        }
-
-        function renderFace(lm) {
-            ctx.fillStyle = "rgba(0, 243, 255, 0.2)";
-            lm.forEach(p => { ctx.beginPath(); ctx.arc(p.x*canvas.width, p.y*canvas.height, 1, 0, 7); ctx.fill(); });
-        }
-
-        function processLogic(h, f) {
-            let cmd = "", label = "";
-
-            // 1. Face Expression Detection (Highest Priority)
-            if (f.faceBlendshapes && f.faceBlendshapes.length > 0) {
-                const shapes = f.faceBlendshapes[0].categories;
-                const getVal = (name) => shapes.find(s => s.categoryName === name)?.score || 0;
-
-                const smile = (getVal("mouthSmileLeft") + getVal("mouthSmileRight")) / 2;
-                const browDown = (getVal("browDownLeft") + getVal("browDownRight")) / 2;
-                const browUp = (getVal("browInnerUp") + getVal("browOuterUpLeft") + getVal("browOuterUpRight")) / 3;
-
-                if (smile > 0.4) { cmd = "funny"; label = "USER_HAPPY_DETECTED"; }
-                else if (browDown > 0.4) { cmd = "angry"; label = "USER_ANGRY_DETECTED"; }
-                else if (browUp > 0.4) { cmd = "love"; label = "USER_SURPRISED_DETECTED"; }
+        function drawTechHand(landmarks) {
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#00ff00";
+            ctx.fillStyle = "#00ff00";
+            const connections = HandLandmarker.HAND_CONNECTIONS;
+            for(let conn of connections) {
+                const p1 = landmarks[conn.start];
+                const p2 = landmarks[conn.end];
+                ctx.beginPath();
+                ctx.moveTo(p1.x * canvas.width, p1.y * canvas.height);
+                ctx.lineTo(p2.x * canvas.width, p2.y * canvas.height);
+                ctx.stroke();
             }
-
-            // 2. Hand Gesture Fallback
-            if (!cmd && h.landmarks && h.landmarks.length > 0) {
-                const lm = h.landmarks[0];
-                const dHeart = h.landmarks.length === 2 ? Math.hypot(h.landmarks[0][8].x-h.landmarks[1][8].x, h.landmarks[0][8].y-h.landmarks[1][8].y) : 1;
-                if (dHeart < 0.07) { cmd = "love"; label = "HEART_PROTOCOL"; }
-            }
-
-            if (cmd && Date.now() - lastTrigger > 4000) {
-                lastTrigger = Date.now();
-                showToast(label);
-                fetch(`http://${ipInput.value}/api/${cmd}`, { mode: 'no-cors' }).catch(() => {});
+            for(let p of landmarks) {
+                ctx.beginPath();
+                ctx.arc(p.x * canvas.width, p.y * canvas.height, 3, 0, 2*Math.PI);
+                ctx.fill();
             }
         }
 
-        function showToast(txt) {
-            alertBox.innerText = txt;
-            alertBox.style.opacity = 1;
-            setTimeout(() => alertBox.style.opacity = 0, 2000);
+        // --- 6. GESTURE LOGIC ---
+        function processGestures(allHands) {
+            let gesture = null;
+            let endpoint = "";
+
+            // Heart (2 Hands)
+            if(allHands.length === 2) {
+                const h1 = allHands[0];
+                const h2 = allHands[1];
+                const dIndex = Math.hypot(h1[8].x - h2[8].x, h1[8].y - h2[8].y);
+                const dThumb = Math.hypot(h1[4].x - h2[4].x, h1[4].y - h2[4].y);
+                if(dIndex < 0.06 && dThumb < 0.06) {
+                    gesture = "HEART DETECTED"; endpoint = "love";
+                }
+            }
+
+            // Gun & ILY (1 Hand)
+            if(!gesture) {
+                for(const lm of allHands) {
+                    const idxOpen = isFingerOpen(lm, 2);
+                    const midOpen = isFingerOpen(lm, 3);
+                    const rngOpen = isFingerOpen(lm, 4);
+                    const pnkOpen = isFingerOpen(lm, 5);
+                    const thumbExtended = Math.hypot(lm[4].x - lm[5].x, lm[4].y - lm[5].y) > 0.05;
+
+                    // GUN LOGIC
+                    if (idxOpen && thumbExtended && !midOpen && !rngOpen && !pnkOpen) {
+                        gesture = "GUN DETECTED 🔫"; endpoint = "angry";
+                    }
+                    // ILY LOGIC
+                    if (idxOpen && pnkOpen && thumbExtended && !midOpen && !rngOpen) {
+                        gesture = "ILY SIGN 🤟"; endpoint = "love";
+                    }
+                }
+            }
+
+            if(gesture) {
+                modeVal.innerText = gesture;
+                const color = endpoint === "angry" ? "red" : "blue";
+                showPopup(gesture, color);
+
+                const now = Date.now();
+                if(now - lastTriggerTime > 4000 && !isProcessing) {
+                    lastTriggerTime = now;
+                    sendToRobot(endpoint, gesture);
+                }
+            }
         }
 
-        bootstrap();
+        function showPopup(text, colorType) {
+            popup.innerText = text;
+            popup.style.borderColor = colorType === "red" ? "#ff7b72" : "#58a6ff";
+            popup.style.color = colorType === "red" ? "#ff7b72" : "#58a6ff";
+            popup.style.opacity = 1;
+            setTimeout(() => popup.style.opacity = 0, 1500);
+        }
+
+        function sendToRobot(endpoint, source) {
+            const ip = ipInput.value;
+            isProcessing = true;
+            log(`Trigger: [${source}] -> /api/${endpoint}`, endpoint === "angry" ? "error" : "success");
+
+            fetch(`http://${ip}/api/${endpoint}`)
+                .then(res => {
+                    if(!res.ok) log(`Server Error: ${res.status}`, "error");
+                })
+                .catch(err => {
+                    log(`Connection Error (Check IP)`, "error");
+                })
+                .finally(() => {
+                    setTimeout(() => isProcessing = false, 1000);
+                });
+        }
     </script>
 </body>
 </html>
