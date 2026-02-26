@@ -1,1 +1,254 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Macro Studio - Pro Control Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .img-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .img-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .action-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .action-btn:active { transform: scale(0.95); }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-[#f8fafc] min-h-screen">
+
+    <!-- Top Navigation -->
+    <header class="sticky top-0 z-50 glass px-4 py-3 md:px-10">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <h1 class="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-600">
+                <i class="fa-solid fa- apertures mr-2"></i>Macro Studio <span class="text-xs font-medium text-slate-400 border border-slate-200 px-2 py-1 rounded-full ml-2">PRO</span>
+            </h1>
+            
+            <!-- Control Buttons -->
+            <div class="flex flex-wrap justify-center gap-3">
+                <button onclick="triggerCamera('https://trigger.macrodroid.com/9aa91e38-485b-482e-9a44-6ed77d27c2d3/frant', 'Front Camera')" 
+                        class="action-btn bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-blue-200 flex items-center text-sm font-semibold">
+                    <i class="fa-solid fa-camera-rotate mr-2 text-lg"></i> Front Cam
+                </button>
+
+                <button onclick="triggerCamera('https://trigger.macrodroid.com/9aa91e38-485b-482e-9a44-6ed77d27c2d3/back', 'Back Camera')" 
+                        class="action-btn bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-200 flex items-center text-sm font-semibold">
+                    <i class="fa-solid fa-camera mr-2 text-lg"></i> Back Cam
+                </button>
+
+                <button onclick="fetchPhotos()" 
+                        class="action-btn bg-white border border-slate-200 text-slate-700 px-5 py-2.5 rounded-xl shadow-sm hover:bg-slate-50 flex items-center text-sm font-semibold">
+                    <i id="refresh-icon" class="fa-solid fa-arrows-rotate mr-2 text-blue-600"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-6">
+        <!-- Dashboard Info -->
+        <div class="mb-10 flex items-end justify-between">
+            <div>
+                <h2 class="text-slate-800 text-3xl font-bold tracking-tight">Recent Captures</h2>
+                <p class="text-slate-500 mt-1">Cloud storage sync active: <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-sm font-mono">/macro_uploads</span></p>
+            </div>
+            <div id="loader" class="hidden">
+                <div class="flex items-center text-blue-600 font-medium">
+                    <svg class="animate-spin h-5 w-5 mr-3 border-4 border-blue-200 border-t-blue-600 rounded-full" viewBox="0 0 24 24"></svg>
+                    Syncing...
+                </div>
+            </div>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div id="gallery" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <!-- Skeleton Loader (Initially visible) -->
+            <div class="animate-pulse bg-slate-200 aspect-square rounded-3xl"></div>
+            <div class="animate-pulse bg-slate-200 aspect-square rounded-3xl"></div>
+            <div class="animate-pulse bg-slate-200 aspect-square rounded-3xl"></div>
+            <div class="animate-pulse bg-slate-200 aspect-square rounded-3xl"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-32 bg-white rounded-3xl border-2 border-dashed border-slate-200">
+            <div class="bg-slate-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-cloud-upload text-3xl text-slate-400"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-slate-700">Abhi koi photos nahi hain</h3>
+            <p class="text-slate-500">Camera trigger karke photo click karein.</p>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 transform transition-all duration-500 translate-y-24 opacity-0 z-[100]">
+        <div class="bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center">
+            <i id="toast-icon" class="fa-solid fa-circle-check mr-3 text-emerald-400"></i>
+            <span id="toast-msg">Command Sent!</span>
+        </div>
+    </div>
+
+    <!-- Firebase Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getStorage, ref, listAll, getDownloadURL, getMetadata, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        // Your Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQXDQ7as5SIIbHAsXuagTbgt89HcdvoKQ",
+            authDomain: "vido-e05d7.firebaseapp.com",
+            projectId: "vido-e05d7",
+            storageBucket: "vido-e05d7.appspot.com",
+            messagingSenderId: "169899782442",
+            appId: "1:169899782442:web:6beb259b6eba97e6972e53"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+
+        // --- functions ---
+        
+        async function fetchPhotos() {
+            const gallery = document.getElementById('gallery');
+            const loader = document.getElementById('loader');
+            const emptyState = document.getElementById('empty-state');
+            const refreshIcon = document.getElementById('refresh-icon');
+            
+            refreshIcon.classList.add('fa-spin');
+            loader.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            try {
+                const listRef = ref(storage, 'macro_uploads');
+                const res = await listAll(listRef);
+
+                if (res.items.length === 0) {
+                    gallery.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                const photoPromises = res.items.map(async (itemRef) => {
+                    const url = await getDownloadURL(itemRef);
+                    const metadata = await getMetadata(itemRef);
+                    return {
+                        name: itemRef.name,
+                        fullPath: itemRef.fullPath,
+                        url: url,
+                        timeCreated: new Date(metadata.timeCreated).getTime(),
+                        dateStr: new Date(metadata.timeCreated).toLocaleString()
+                    };
+                });
+
+                let photos = await Promise.all(photoPromises);
+                photos.sort((a, b) => b.timeCreated - a.timeCreated);
+
+                gallery.innerHTML = '';
+                photos.forEach(photo => {
+                    const card = document.createElement('div');
+                    card.className = "img-card group bg-white rounded-3xl p-3 border border-slate-100 shadow-sm";
+                    
+                    card.innerHTML = `
+                        <div class="relative aspect-square overflow-hidden rounded-2xl bg-slate-100">
+                            <img src="${photo.url}" alt="${photo.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                <a href="${photo.url}" target="_blank" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-800 hover:bg-blue-500 hover:text-white transition-colors">
+                                    <i class="fa-solid fa-expand"></i>
+                                </a>
+                                <button onclick="window.confirmDelete('${photo.fullPath}')" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-colors">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-4 px-1 pb-1">
+                            <p class="text-[11px] font-bold text-blue-600 uppercase tracking-wider mb-1">Captured</p>
+                            <p class="text-sm font-semibold text-slate-800 truncate">${photo.name}</p>
+                            <p class="text-xs text-slate-400 mt-1 flex items-center">
+                                <i class="fa-regular fa-calendar-alt mr-1"></i> ${photo.dateStr}
+                            </p>
+                        </div>
+                    `;
+                    gallery.appendChild(card);
+                });
+
+            } catch (error) {
+                showToast("Error loading gallery", "error");
+            } finally {
+                loader.classList.add('hidden');
+                refreshIcon.classList.remove('fa-spin');
+            }
+        }
+
+        // Camera Trigger Function
+        window.triggerCamera = async (url, label) => {
+            showToast(`${label} Triggering...`, "info");
+            try {
+                // We use mode no-cors because MacroDroid triggers often don't return CORS headers
+                await fetch(url, { mode: 'no-cors' });
+                setTimeout(() => {
+                    showToast(`${label} Command Sent!`, "success");
+                }, 500);
+            } catch (error) {
+                showToast("Connection failed", "error");
+            }
+        };
+
+        window.confirmDelete = async (path) => {
+            if (confirm("Delete this photo?")) {
+                try {
+                    const fileRef = ref(storage, path);
+                    await deleteObject(fileRef);
+                    showToast("Deleted Successfully", "success");
+                    fetchPhotos();
+                } catch (error) {
+                    showToast("Delete failed", "error");
+                }
+            }
+        };
+
+        function showToast(msg, type = "success") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toastMsg.innerText = msg;
+            
+            if(type === "error") {
+                toastIcon.className = "fa-solid fa-circle-exclamation mr-3 text-red-400";
+            } else if(type === "info") {
+                toastIcon.className = "fa-solid fa-circle-info mr-3 text-blue-400";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check mr-3 text-emerald-400";
+            }
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        window.fetchPhotos = fetchPhotos;
+        fetchPhotos();
+    </script>
+</body>
+</html>
