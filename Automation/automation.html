@@ -70,7 +70,6 @@
             margin-bottom: 50px;
         }
 
-        /* Header Section */
         header {
             display: flex;
             justify-content: space-between;
@@ -112,7 +111,6 @@
             animation: blinker 1.5s linear infinite;
         }
 
-        /* Input Section */
         .config-panel {
             margin-bottom: 25px;
             position: relative;
@@ -149,7 +147,6 @@
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.15);
         }
 
-        /* Section Titles */
         .section-title {
             font-size: 0.8rem;
             color: #aaa;
@@ -165,14 +162,12 @@
             background: linear-gradient(90deg, #333, transparent);
         }
 
-        /* Grid Layout */
         .control-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* Mobile Default: 2 cols */
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
 
-        /* Button Styling */
         .cyber-btn {
             position: relative;
             background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.2));
@@ -189,7 +184,7 @@
             overflow: hidden;
             height: 90px;
             text-align: center;
-            text-decoration: none; /* For links */
+            text-decoration: none;
         }
 
         .cyber-btn::before {
@@ -220,18 +215,11 @@
             color: #e0e0e0;
         }
 
-        /* Status colors for buttons */
         .color-red { --btn-color: var(--danger); }
         .color-cyan { --btn-color: var(--primary); }
         .color-yellow { --btn-color: var(--warning); }
         .color-purple { --btn-color: var(--accent); }
 
-        .cyber-btn:hover i {
-            transform: scale(1.1);
-            text-shadow: 0 0 15px var(--btn-color);
-        }
-
-        /* Terminal Log */
         .terminal {
             margin-top: 30px;
             background: #000;
@@ -256,7 +244,6 @@
         .log-error { color: #ff2a6d; }
         .log-info { color: var(--primary); }
 
-        /* Footer */
         footer {
             text-align: center;
             margin-top: 20px;
@@ -265,20 +252,13 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes blinker { 50% { opacity: 0; } }
         @keyframes slideLeft { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* Media Queries for Responsive Design */
         @media (min-width: 600px) {
             .control-grid { grid-template-columns: repeat(3, 1fr); }
         }
-        @media (max-width: 350px) {
-            .control-grid { grid-template-columns: 1fr; }
-            h1 { font-size: 1rem; }
-        }
-
     </style>
 </head>
 <body>
@@ -303,15 +283,15 @@
         <!-- Section 1: Surveillance -->
         <div class="section-title"><i class="fas fa-eye"></i> SURVEILLANCE</div>
         <div class="control-grid">
-            <!-- UPDATED BUTTON HERE -->
             <div class="cyber-btn color-red" onclick="openTracker()">
                 <i class="fas fa-satellite-dish"></i>
                 <span>OPEN TRACKER</span>
             </div>
             
-            <div class="cyber-btn color-red" onclick="execCmd('backcam', 'Activating Cam...')">
+            <!-- UPDATED BUTTON LINK -->
+            <div class="cyber-btn color-red" onclick="openCamera()">
                 <i class="fas fa-camera"></i>
-                <span>BACK CAM</span>
+                <span>Camera Track</span>
             </div>
         </div>
 
@@ -353,7 +333,6 @@
             </div>
         </div>
 
-        <!-- Console -->
         <div class="terminal" id="console">
             <div class="log-line log-info">> System initialized.</div>
             <div class="log-line log-info">> Connected to secure server.</div>
@@ -366,7 +345,6 @@
     </div>
 
     <script>
-        // Auto-save URL logic
         window.addEventListener('load', () => {
             const saved = localStorage.getItem('nexus_url');
             if(saved) document.getElementById('webhookURL').value = saved;
@@ -377,20 +355,26 @@
         function addLog(msg, type) {
             const now = new Date();
             const time = now.toLocaleTimeString('en-US', { hour12: false, hour: "numeric", minute: "numeric", second: "numeric" });
-            
             const line = document.createElement('div');
             line.className = `log-line log-${type}`;
             line.innerHTML = `<span class="log-time">[${time}]</span> ${msg}`;
-            
             logArea.prepend(line);
         }
 
-        // New Function for Tracking Button
         function openTracker() {
             addLog('INITIATING: Satellite Tracking Module...', 'success');
             vibrate(50);
             setTimeout(() => {
                 window.open('https://sushiljat.vercel.app/Automation/Locationtrack.html', '_blank');
+            }, 300);
+        }
+
+        // NEW FUNCTION FOR CAMERA LINK
+        function openCamera() {
+            addLog('INITIATING: Remote Camera Access...', 'success');
+            vibrate(50);
+            setTimeout(() => {
+                window.open('https://sushiljat.vercel.app/Automation/Camera.html', '_blank');
             }, 300);
         }
 
@@ -404,31 +388,23 @@
                 return;
             }
 
-            // Save URL
             localStorage.setItem('nexus_url', url);
-
-            // UI Feedback
             addLog(`Executing: ${action.toUpperCase()}...`, 'info');
-            vibrate(30); // Short haptic feedback
+            vibrate(30);
 
-            // API Call
             fetch(url + '/' + action)
                 .then(res => {
                     if (res.ok) {
                         addLog(`SUCCESS: Command '${action}' transmitted.`, 'success');
-                        vibrate([20]); 
                     } else {
                         addLog(`FAILED: Server rejected '${action}'.`, 'error');
-                        vibrate([100, 50, 100]); 
                     }
                 })
                 .catch(err => {
                     addLog(`NETWORK ERROR: Check connection.`, 'error');
-                    vibrate([100, 50, 100]);
                 });
         }
 
-        // Helper for mobile vibration
         function vibrate(pattern) {
             if (navigator.vibrate) {
                 navigator.vibrate(pattern);
